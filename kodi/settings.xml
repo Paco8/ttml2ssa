@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<settings>
+    <category label="32000">
+        <setting label="32001" type="text" id="fontname" default="Arial"/>
+        <setting label="32002" type="number" id="fontsize" default="50"/>
+        <setting label="32003" type="text" id="primarycolor" default="00EEEEEE"/>
+        <setting label="32004" type="text" id="backcolor" default="40000000"/>
+        <setting label="32005" type="text" id="outlinecolor" default="00000000"/>
+        <setting label="32006" type="enum" id="borderstyle" lvalues="32016|32017"/>
+        <setting label="32007" type="number" id="outline" default="2"/>
+        <setting label="32008" type="number" id="shadow" default="3"/>
+        <setting label="32018" type="bool" id="bold" default="false"/>
+        <setting label="32019" type="bool" id="italic" default="false"/>
+        <setting label="32009" type="number" id="marginv" default="40"/>
+        <setting label="32010" type="number" id="marginl" default="40"/>
+        <setting label="32011" type="number" id="marginr" default="40"/>
+    </category>
+    <category label="32012">
+        <setting label="32013" type="bool" id="cosmetic_filter" default="true"/>
+        <setting label="32014" type="bool" id="language_filter" default="true"/>
+        <setting label="32015" type="number" id="min_sep" default="200"/>
+    </category>
+</settings>
