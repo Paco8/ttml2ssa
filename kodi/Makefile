@@ -1,8 +1,5 @@
-
-VERSION=0.1.7
-PYTHON_VERSION=2.26.0
-
-OUTPUT_DIR=script.module.ttml2ssa
+VERSION = $(shell sed -n -e "s/.*VERSION = '\(.*\)'/\1/p" ../ttml2ssa.py)
+OUTPUT_DIR = script.module.ttml2ssa
 
 install: ../ttml2ssa.py addon.xml-k18 addon.xml-k19
 	-install -d $(OUTPUT_DIR)/resources/lib/
@@ -12,7 +9,6 @@ install: ../ttml2ssa.py addon.xml-k18 addon.xml-k19
 	install -m 644 icon.png $(OUTPUT_DIR)/
 	install -m 644 settings.xml $(OUTPUT_DIR)/resources/
 	sed -e 's/{version}/$(VERSION)/' -i $(OUTPUT_DIR)/addon.xml-k18
-	#sed -e 's/{PYTHON_VERSION}/$(PYTHON_VERSION)/' -i $(OUTPUT_DIR)/addon.xml
 
 	cd translations && make
 	-install -d $(OUTPUT_DIR)/resources/language/resource.language.en_gb/

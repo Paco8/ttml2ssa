@@ -212,6 +212,8 @@ class TimestampConverter(object):
 
 class Ttml2Ssa(object):
 
+    VERSION = '0.1.8'
+
     TIME_BASES = [
         'media',
         'smpte',
@@ -651,11 +653,7 @@ class Ttml2Ssa(object):
         self._printinfo("Replacements for language '{}': {}".format(lang, total_count))
 
     def _printinfo(self, text):
-        try:
-            import xbmc
-            xbmc.log("Ttml2Ssa: {}".format(text), xbmc.LOGINFO)
-        except:
-            print(text)
+        print(text)
 
     def write2file(self, output):
         """Write subtitle to file
@@ -749,6 +747,7 @@ if __name__ == '__main__':
     argparser = argparse.ArgumentParser(
         description='Convert TTML/XML/DFXP subtitles to SubRip (SRT) or SSA/ASS format.')
     argparser.add_argument('input-file',
+        nargs="?",
         help='subtitle file',
         action='store')
     argparser.add_argument('output-file',
@@ -789,6 +788,10 @@ if __name__ == '__main__':
         dest="language_filter",
         help="disables a filter which may fix some wrong characters in some specific languages",
         action='store_false')
+    argparser.add_argument('-v', '--version',
+        dest="version",
+        help="displays the version of this application",
+        action='store_true')
     args = argparser.parse_args()
 
     if args.scale in Ttml2Ssa.SCALE.keys():
@@ -801,9 +804,13 @@ if __name__ == '__main__':
     ttml.use_cosmetic_filter = args.cosmetic_filter
     ttml.use_language_filter = args.language_filter
 
-    input_file = getattr(args, 'input-file')
-    ttml.parse_subtitle_file(input_file)
+    if args.version:
+        print("ttml2ssa version {}".format(ttml.VERSION))
 
+    input_file = getattr(args, 'input-file')
     output_file = getattr(args, 'output-file')
-    if output_file:
-        ttml.write2file(output_file)
+
+    if input_file:
+        ttml.parse_subtitle_file(input_file)
+        if output_file:
+            ttml.write2file(output_file)
