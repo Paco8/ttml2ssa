@@ -112,7 +112,7 @@ result = ttml.generate_srt()
 result = ttml.generate_ssa()
 ```
 
-To open the ttml2ssa configuration dialog, you can add this to addon settings.xml:
+To open the ttml2ssa configuration dialog, you can add this to your addon settings.xml:
 ```
 <setting label="SSA Settings" type="action" id="ssa_settings" option="close" action="Addon.OpenSettings(script.module.ttml2ssa)"/>
 ```
