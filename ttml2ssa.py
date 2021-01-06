@@ -277,9 +277,9 @@ class Ttml2Ssa(object):
 
         extension = os.path.splitext(filename)[1].lower()
         if extension == ".srt" or extension == ".vtt":
-            ttml.parse_vtt_file(input_file)
+            self.parse_vtt_file(filename)
         else:
-            ttml.parse_ttml_file(input_file)
+            self.parse_ttml_file(filename)
 
     def parse_ttml_file(self, filename):
         """Read and parse a ttml/xml/dfxp file.
