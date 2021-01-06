@@ -86,6 +86,37 @@ result = ttml.generate_srt()
 result = ttml.generate_ssa()
 ```
 
+### Addon for Kodi
+There's also an addon for Kodi
+([script.module.ttml2ssa](https://github.com/Paco8/kodi-repo/blob/master/packages/script.module.ttml2ssa/script.module.ttml2ssa-0.1.7.zip)),
+which other addons can use to convert subtitles to SRT or SSA.
+It provides a configuration dialog where the user can configure the SSA style and other stuff.
+
+You can use it with something like this:
+```
+from ttml2ssa import Ttml2SsaKodi
+...
+
+ttml = Ttml2SsaKodi()
+ttml.parse_subtitle_file(input_file)
+# or
+ttml.parse_ttml_from_string(subtitle_in_a_string)
+
+ttml.write2file('output.srt')
+# or
+ttml.write2file('output.ssa')
+
+# or
+result = ttml.generate_srt()
+# or
+result = ttml.generate_ssa()
+```
+
+To open the ttml2ssa configuration dialog, you can add this to addon settings.xml:
+```
+<setting label="SSA Settings" type="action" id="ssa_settings" option="close" action="Addon.OpenSettings(script.module.ttml2ssa)"/>
+```
+
 ### Authors
 ttml2ssa.py by Paco8, based on [ttml2srt](https://github.com/yuppity/ttml2srt) by yuppity.
-License: Unlicense License
+License: GPL-2.0
