@@ -530,7 +530,7 @@ class Ttml2Ssa(object):
         lines = vtt.splitlines()
         i = 0
         while i < len(lines):
-            line = lines[i]
+            line = lines[i].strip()
             i += 1
             m = re.match('(?P<t1>\d{2}:\d{2}:\d{2}[\.,]\d{3})\s-->\s(?P<t2>\d{2}:\d{2}:\d{2}[\.,]\d{3})(?:.*(?P<pos>start|end))?', line)
             if m:
