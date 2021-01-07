@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # encoding: utf-8
 #
 #  --------------------------------------------
@@ -16,198 +15,7 @@ except:
 import re
 import os.path
 from collections import OrderedDict
-
-class TimestampConverter(object):
-
-    def __init__(self, frame_rate=23.976, tick_rate=1):
-        self.tick_rate = tick_rate
-        self.frame_rate = frame_rate
-
-    def timeexpr_to_ms(self, *args):
-        return self._timeexpr_to_ms(*args)
-
-    def _timeexpr_to_ms(self, time_expr):
-        """Use the given time expression to get a matching conversion method
-        to overwrite self.timeexpr_to_ms() with.
-        """
-
-        self.timeexpr_to_ms = self.determine_ms_convfn(time_expr)
-        return self.timeexpr_to_ms(time_expr)
-
-    def _hhmmss_to_ms(self, hh, mm, ss):
-        return hh * 3600 * 1000 + mm * 60 * 1000 + ss * 1000
-
-    def subrip_to_ms(self, timestamp):
-        """Desconstruct SubRip timecode down to milliseconds
-        """
-
-        hh, mm, ss, ms = re.split(r'[:,]', timestamp)
-        return int(int(hh) * 3.6e6 + int(mm) * 60000 + int(ss) * 1000 + int(ms))
-
-    def _metric_to_ms(self, metric_multiplier, metric_value):
-        return int(metric_multiplier * metric_value)
-
-    def _ms_to_hhmmssms(self, ms):
-        hh = int(ms / 3.6e6)
-        mm = int((ms % 3.6e6) / 60000)
-        ss = int((ms % 60000) / 1000)
-        ms = int(ms % 1000)
-
-        return hh, mm, ss, ms
-
-    def ms_to_subrip(self, ms):
-        """Build SubRip timecode from milliseconds
-        """
-
-        hh, mm, ss, ms = self._ms_to_hhmmssms(ms)
-        return '{:02d}:{:02d}:{:02d},{:03d}'.format(hh, mm, ss, ms)
-
-    def ms_to_ssa(self, ms):
-        """Build SSA/ASS timecode from milliseconds
-        """
-
-        hh, mm, ss, ms = self._ms_to_hhmmssms(ms)
-        return '{:01d}:{:02d}:{:02d}.{:02d}'.format(hh, mm, ss, int(ms / 10))
-
-    def frames_to_ms(self, frames):
-        """Convert frame count to ms
-        """
-
-        return int(int(frames) * (1000 / self.frame_rate))
-
-    def offset_frames_to_ms(self, time):
-        """Convert offset-time expression with f metric to milliseconds.
-        """
-
-        frames = float(time[:-1])
-        return int(int(frames) * (1000 / self.frame_rate))
-
-    def offset_ticks_to_ms(self, time):
-        """Convert offset-time expression with t metric to milliseconds.
-        """
-
-        ticks = int(time[:-1])
-        seconds = 1.0 / self.tick_rate
-        return (seconds * ticks) * 1000
-
-    def offset_hours_to_ms(self, time):
-        """Convert offset-time expression with h metric to milliseconds.
-        """
-
-        hours = float(time[:-1])
-        return self._metric_to_ms(3.6e6, hours)
-
-    def offset_minutes_to_ms(self, time):
-        """Convert offset-time expression with m metric to milliseconds.
-        """
-
-        return self._metric_to_ms(60 * 1000, float(time[:-1]))
-
-    def offset_seconds_to_ms(self, time):
-        """Convert offset-time expression with s metric to milliseconds.
-        """
-
-        seconds = float(time[:-1])
-        return self._metric_to_ms(1000, seconds)
-
-    def offset_ms_to_ms(self, time):
-        """Convert offset-time expression with ms metric to milliseconds.
-        """
-
-        ms = int(time[:-2])
-        return ms
-
-    def fraction_timestamp_to_ms(self, timestamp):
-        """Convert hh:mm:ss.fraction to milliseconds
-        """
-
-        hh, mm, ss, fraction = re.split(r'[:.]', timestamp)
-        hh, mm, ss = [int(i) for i in (hh, mm, ss)]
-        # Resolution beyond ms is useless for our purposes
-        ms = int(fraction[:3])
-
-        return self._hhmmss_to_ms(hh, mm, ss) + ms
-
-    def frame_timestamp_to_ms(self, timestamp):
-        """Convert hh:mm:ss:frames to milliseconds
-
-        Will handle hh:mm:ss:frames.sub-frames by discarding the sub-frame part
-        """
-
-        hh, mm, ss, frames = [int(i) for i in timestamp.split('.')[0].split(':')]
-        hhmmss_ms = self._hhmmss_to_ms(hh, mm, ss)
-        ms = self.frames_to_ms(frames)
-        return hhmmss_ms + ms
-
-    def determine_ms_convfn(self, time_expr):
-        """Determine approriate ms conversion fn to pass the time expression to.
-
-        Args:
-            time_exrp (str): TTML time expression
-
-        Return:
-            Conversion method (callable)
-
-        Strips the time expression of digits and uses the resulting string as
-        a key to a dict of conversion methods.
-        """
-
-        # Map time expression delimiters to conversion methods. Saves
-        # us from having to exec multibranch code on each line but assumes all
-        # time expressions to be of the same form.
-        time_expr_fns = {
-
-            # clock-time, no frames or fraction
-            # Example(s): "00:02:23"
-            '::': self.frame_timestamp_to_ms,
-
-            # clock-time, frames
-            # Example(s): "00:02:23:12", "00:02:23:12.222"
-            ':::': self.frame_timestamp_to_ms,
-            ':::.': self.frame_timestamp_to_ms,
-
-            # clock-time, fraction
-            # Example(s): "00:02:23.283"
-            '::.': self.fraction_timestamp_to_ms,
-
-            # offset-time, hour metric
-            # Example(s): "1h", "1.232837372637h"
-            'h': self.offset_hours_to_ms,
-            '.h': self.offset_hours_to_ms,
-
-            # offset-time, minute metric
-            # Example(s): "1m", "13.72986323m"
-            'm': self.offset_minutes_to_ms,
-            '.m': self.offset_minutes_to_ms,
-
-            # offset-time, second metric
-            # Example(s): "1s", "113.2312312s"
-            's': self.offset_seconds_to_ms,
-            '.s': self.offset_seconds_to_ms,
-
-            # offset-time, millisecond metric
-            # Example(s): "1ms", "1000.1231231231223ms"
-            'ms': self.offset_ms_to_ms,
-            '.ms': self.offset_ms_to_ms,
-
-            # offset-time, frame metric
-            # Example(s): "100f"
-            'f': self.offset_frames_to_ms,
-            '.f': self.offset_frames_to_ms,
-
-            # offset-time, tick metric
-            # Example(s): "19298323t"
-            't': self.offset_ticks_to_ms,
-            '.t': self.offset_ticks_to_ms,
-
-        }
-
-        try:
-            delims = ''.join([i for i in time_expr if not i.isdigit()])
-            return time_expr_fns[delims]
-        except KeyError:
-            raise NotImplementedError(
-                'Unknown timestamp format ("{}")'.format(time_expr))
+from timestampconverter import TimestampConverter
 
 
 class Ttml2Ssa(object):
@@ -269,7 +77,7 @@ class Ttml2Ssa(object):
         """ Adjust the SSA options PlaResX and PlayRexY according to the aspect ratio of the video """
         self.ssa_playresy = int(self.ssa_playresx / ratio)
 
-    def parse_subtitle_file(self, filename):
+    def parse_subtitle_file(self, filename, file_encoding = None):
         """Read and parse a subtitle file.
         If the file has the vtt or srt extension it will be parsed as a vtt. Otherwise it will be parsed as ttml.
         The result is stored in the `entries` list, as begin (ms), end (ms), text, position.
@@ -277,19 +85,16 @@ class Ttml2Ssa(object):
 
         extension = os.path.splitext(filename)[1].lower()
         if extension == ".srt" or extension == ".vtt":
-            self.parse_vtt_file(filename)
+            self.parse_vtt_file(filename, file_encoding)
         else:
-            self.parse_ttml_file(filename)
+            self.parse_ttml_file(filename, file_encoding)
 
-    def parse_ttml_file(self, filename):
+    def parse_ttml_file(self, filename, file_encoding = None):
         """Read and parse a ttml/xml/dfxp file.
         The result is stored in the `entries` list, as begin (ms), end (ms), text, position.
         """
 
-        doc = ''
-        import io
-        with io.open(filename, 'r', encoding='utf-8') as handle:
-            doc = handle.read()
+        doc = self._read_file(filename, file_encoding)
         self.parse_ttml_from_string(doc.encode('utf-8'))
 
     def parse_ttml_from_string(self, doc):
@@ -508,15 +313,12 @@ class Ttml2Ssa(object):
         return ms_begin, ms_end, dialogue, position
 
 
-    def parse_vtt_file(self, filename):
+    def parse_vtt_file(self, filename, file_encoding = None):
         """Read and parse a vtt/srt file.
         The result is stored in the `entries` list, as begin (ms), end (ms), text, position.
         """
 
-        vtt = ""
-        import io
-        with io.open(filename, 'r', encoding='utf-8') as handle:
-            vtt = handle.read()
+        vtt = self._read_file(filename, file_encoding)
         self.parse_vtt_from_string(vtt)
 
     def parse_vtt_from_string(self, vtt):
@@ -554,7 +356,7 @@ class Ttml2Ssa(object):
     def generate_srt(self):
         """Return a string with the generated subtitle document in srt format."""
 
-        entries = sorted(self.entries, key=lambda begin: begin['ms_begin'])
+        entries = sorted(self.entries, key=lambda x: x['ms_begin'])
 
         srt_format_str = '{}\r\n{} --> {}\r\n{}\r\n\r\n'
         res = ''
@@ -571,16 +373,17 @@ class Ttml2Ssa(object):
         return res
 
     def _paragraphs_to_ssa(self, timestamp_min_sep = 200):
-        entries = sorted(self.entries, key=lambda begin: begin['ms_begin'])
+        entries = sorted(self.entries, key=lambda x: x['ms_begin'])
 
         if (timestamp_min_sep > 0 and len(self.entries) > 1):
-            for i in range(len(entries)):
-                if i == 0: continue
+            i = 1
+            while i < len(entries):
                 diff =  entries[i]['ms_begin'] - entries[i-1]['ms_end']
                 if (diff < timestamp_min_sep):
                     s = round((timestamp_min_sep - diff) / 2)
                     entries[i]['ms_begin'] += s
                     entries[i-1]['ms_end'] -= s
+                i += 1
 
         ssa_format_str = 'Dialogue: 0,{},{},Default,{}\r\n'
         res = ""
@@ -671,6 +474,28 @@ class Ttml2Ssa(object):
             else:
                 handle.write(self.generate_srt())
 
+    def _read_file(self, filename, encoding = None):
+        """ Try to read the file using the supplied encoding (if any), utf-8 and latin-1 """
+
+        import io
+
+        contents = ""
+
+        encodings = ['utf-8', 'latin-1']
+        if encoding:
+            encodings.insert(0, encoding)
+
+        for enc in encodings:
+            try:
+                self._printinfo("Opening file {} with encoding {}".format(filename, enc))
+                with io.open(filename, 'r', encoding=enc) as handle:
+                    contents = handle.read()
+                    break
+            except UnicodeDecodeError:
+                 self._printinfo("Error opening {}".format(filename))
+
+        return contents
+
     @staticmethod
     def mfn2subfn(media_filename, lang=None, m_ext=True, format='srt'):
         """Create subtitle filename from media filename
@@ -738,79 +563,3 @@ class Ttml2SsaKodi(Ttml2Ssa):
     def _printinfo(self, text):
         import xbmc
         xbmc.log("Ttml2Ssa: {}".format(text), xbmc.LOGINFO)
-
-
-if __name__ == '__main__':
-
-    import argparse
-
-    argparser = argparse.ArgumentParser(
-        description='Convert TTML/XML/DFXP subtitles to SubRip (SRT) or SSA/ASS format.')
-    argparser.add_argument('input-file',
-        nargs="?",
-        help='subtitle file',
-        action='store')
-    argparser.add_argument('output-file',
-        nargs='?',
-        help='output file with extension srt, ssa or ass',
-        action='store')
-    argparser.add_argument('-s', '--shift',
-        dest='shift', help='shift',
-        metavar='ms', nargs='?',
-        const=0, default=0, type=float,
-        action='store')
-    argparser.add_argument('-f', '--fps',
-        dest='sfps', metavar='fps',
-        help='frames per second (default: 23.976)',
-        nargs='?', const=23.976,
-        default=23.976, type=float,
-        action='store')
-    argparser.add_argument('-sf', '--scale-factor',
-        dest='scale', metavar='number or label',
-        help='multiplies the timestamps by this mumber. You can use also any of these labels: '
-             'NTSC2PAL (23.976/25), PAL2NTSC (25/23.976), '
-             'NTSC2FILM (23.976/24), PAL2FILM (25/24), '
-             'FILM2NTSC (24/23.976), FILM2PAL (24/25)',
-        nargs='?', type=str, default='1', action='store')
-    argparser.add_argument('--min-sep-ms',
-        dest="ssa_timestamp_min_sep", metavar="ms",
-        help="minimum separation (in ms) between framestamps (SSA/ASS only)",
-        nargs="?", type=int, default=200, action='store')
-    argparser.add_argument('-l', '--lang',
-        dest="lang", metavar="language code",
-        help="subtitle language code ('en', 'es', etc,). Used with the language filter",
-        nargs="?", type=str, default=None, action='store')
-    argparser.add_argument('-ncf', '--no-cosmetic-filter',
-        dest="cosmetic_filter",
-        help="disables a filter which makes some cosmetic changes, like adding a space after the symbol '-' and the next word",
-        action='store_false')
-    argparser.add_argument('-nlf', '--no-language-filter',
-        dest="language_filter",
-        help="disables a filter which may fix some wrong characters in some specific languages",
-        action='store_false')
-    argparser.add_argument('-v', '--version',
-        dest="version",
-        help="displays the version of this application",
-        action='store_true')
-    args = argparser.parse_args()
-
-    if args.scale in Ttml2Ssa.SCALE.keys():
-        scale_factor = Ttml2Ssa.SCALE[args.scale]
-    else:
-        scale_factor = eval(args.scale)
-
-    ttml = Ttml2Ssa(shift=args.shift, source_fps = args.sfps, scale_factor = scale_factor, subtitle_language = args.lang)
-    ttml.ssa_timestamp_min_sep = args.ssa_timestamp_min_sep
-    ttml.use_cosmetic_filter = args.cosmetic_filter
-    ttml.use_language_filter = args.language_filter
-
-    if args.version:
-        print("ttml2ssa version {}".format(ttml.VERSION))
-
-    input_file = getattr(args, 'input-file')
-    output_file = getattr(args, 'output-file')
-
-    if input_file:
-        ttml.parse_subtitle_file(input_file)
-        if output_file:
-            ttml.write2file(output_file)

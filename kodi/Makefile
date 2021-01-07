@@ -1,9 +1,10 @@
-VERSION = $(shell sed -n -e "s/.*VERSION = '\(.*\)'/\1/p" ../ttml2ssa.py)
+VERSION = $(shell sed -n -e "s/.*VERSION = '\(.*\)'/\1/p" ../src/ttml2ssa.py)
 OUTPUT_DIR = script.module.ttml2ssa
 
-install: ../ttml2ssa.py addon.xml-k18 addon.xml-k19
+install: ../src/ttml2ssa.py ../src/timestampconverter.py addon.xml-k18 addon.xml-k19
 	-install -d $(OUTPUT_DIR)/resources/lib/
-	install -m 644 ../ttml2ssa.py $(OUTPUT_DIR)/resources/lib/
+	install -m 644 ../src/ttml2ssa.py $(OUTPUT_DIR)/resources/lib/
+	install -m 644 ../src/timestampconverter.py $(OUTPUT_DIR)/resources/lib/
 	install -m 644 addon.xml-k18 $(OUTPUT_DIR)/
 	install -m 644 addon.xml-k19 $(OUTPUT_DIR)/
 	install -m 644 icon.png $(OUTPUT_DIR)/

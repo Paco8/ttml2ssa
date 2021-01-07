@@ -25,6 +25,10 @@ optional arguments:
   -l [language code], --lang [language code]
                         subtitle language code ('en', 'es', etc,). Used with
                         the language filter
+  -a [number], --video-aspect [number]
+                        the aspect ratio of the video. It's used to calculate
+                        the correct PlayResY and PlayResY options for the SSA
+                        style. Default: 16/9
   -ncf, --no-cosmetic-filter
                         disables a filter which makes some cosmetic changes,
                         like adding a space after the symbol '-' and the next
@@ -32,6 +36,9 @@ optional arguments:
   -nlf, --no-language-filter
                         disables a filter which may fix some wrong characters
                         in some specific languages
+  --encoding [ENCODING]
+                        the encoding of the input file
+  -v, --version         displays the version of this application
 ```
 
 ### Common use cases
