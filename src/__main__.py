@@ -62,8 +62,8 @@ if __name__ == '__main__':
         dest="language_filter",
         help="disables a filter which may fix some wrong characters in some specific languages",
         action='store_false')
-    argparser.add_argument('--encoding',
-        dest='encoding',
+    argparser.add_argument('-c', '--charset',
+        dest='encoding', metavar='encoding',
         help='the encoding of the input file',
         nargs='?',
         const=0, default=None, type=str,
@@ -90,6 +90,9 @@ if __name__ == '__main__':
 
     input_file = getattr(args, 'input-file')
     output_file = getattr(args, 'output-file')
+
+    if not input_file:
+        argparser.print_usage()
 
     if input_file:
         ttml.parse_subtitle_file(input_file, args.encoding)
