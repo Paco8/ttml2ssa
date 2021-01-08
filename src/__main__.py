@@ -99,6 +99,6 @@ if __name__ == '__main__':
             import os.path
             basename = os.path.splitext(input_file)[0]
             output_file = basename + ".ssa"
-        print("Convertion {} to {}".format(input_file, output_file))
+        print("Converting {} to {}".format(input_file, output_file))
         ttml.parse_subtitle_file(input_file, args.encoding)
         ttml.write2file(output_file)
