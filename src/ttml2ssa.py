@@ -20,7 +20,7 @@ from timestampconverter import TimestampConverter
 
 class Ttml2Ssa(object):
 
-    VERSION = '0.1.8'
+    VERSION = '0.1.9'
 
     TIME_BASES = [
         'media',
@@ -542,9 +542,9 @@ class Ttml2Ssa(object):
         return camel
 
 
-class Ttml2SsaKodi(Ttml2Ssa):
+class Ttml2SsaAddon(Ttml2Ssa):
     def __init__(self, shift = 0, source_fps = 23.976, scale_factor = 1, subtitle_language = None):
-        super(Ttml2SsaKodi, self).__init__(shift, source_fps, scale_factor, subtitle_language)
+        super(Ttml2SsaAddon, self).__init__(shift, source_fps, scale_factor, subtitle_language)
         import xbmcaddon
         self.addon = xbmcaddon.Addon('script.module.ttml2ssa')
         self.ssa_style["Fontname"] = self.addon.getSetting('fontname')
