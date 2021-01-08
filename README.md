@@ -36,7 +36,7 @@ optional arguments:
   -nlf, --no-language-filter
                         disables a filter which may fix some wrong characters
                         in some specific languages
-  --encoding [ENCODING]
+  -c [encoding], --charset [encoding]
                         the encoding of the input file
   -v, --version         displays the version of this application
 ```
