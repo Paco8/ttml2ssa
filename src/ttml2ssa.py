@@ -303,8 +303,8 @@ class Ttml2Ssa(object):
         new_text = ""
         for line in dialogue.splitlines():
             line = line.strip()
-            if line != "":
-                if new_text != "": new_text += "\n"
+            if line:
+                if new_text: new_text += "\n"
                 new_text += line
         dialogue = new_text
 
@@ -432,8 +432,16 @@ class Ttml2Ssa(object):
         for entry in self.entries:
             entry['text'], n_changes = re.subn('—', '-', entry['text']);
             total_count += n_changes
+
+            # Add an space between '-' and the first word
             entry['text'], n_changes = re.subn(r'^(<i>|</i>|)-(\S)', r'\1- \2', entry['text'], flags=re.MULTILINE)
             total_count += n_changes
+
+            # Add missing '-' in the first line
+            if re.match(r'^(?!(-)|<i>-).*?\n(-|<i>-)', entry['text']):
+                entry['text'] = '- ' + entry['text']
+                total_count += 1
+
         self._printinfo("Cosmetic changes: {}".format(total_count))
 
     def _language_fix_filter(self):
