@@ -95,6 +95,10 @@ if __name__ == '__main__':
         argparser.print_usage()
 
     if input_file:
+        if not output_file:
+            import os.path
+            basename = os.path.splitext(input_file)[0]
+            output_file = basename + ".ssa"
+        print("Convertion {} to {}".format(input_file, output_file))
         ttml.parse_subtitle_file(input_file, args.encoding)
-        if output_file:
-            ttml.write2file(output_file)
+        ttml.write2file(output_file)
