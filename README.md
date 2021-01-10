@@ -6,67 +6,86 @@ Note: `ttml2ssa` is *not* a full-featured TTML-to-SRT converter and only works o
 ## Usage
 ```
 positional arguments:
-  input-file            subtitle file
-  output-file           output file with extension srt, ssa or ass
+  input-files           subtitle files
 
 optional arguments:
   -h, --help            show this help message and exit
-  -s [ms], --shift [ms]
-                        shift
-  -f [fps], --fps [fps]
-                        frames per second (default: 23.976)
-  -sf [number or label], --scale-factor [number or label]
+  -o [output file], --output [output file]
+                        output file with extension srt, ssa or ass
+  --shift [ms]          increases all timestamps by the specified value. You
+                        can use a negative number
+  --scale-factor [number or label]
                         multiplies the timestamps by this mumber. You can use
                         also any of these labels: NTSC2PAL (23.976/25),
                         PAL2NTSC (25/23.976), NTSC2FILM (23.976/24), PAL2FILM
                         (25/24), FILM2NTSC (24/23.976), FILM2PAL (24/25)
   --min-sep-ms [ms]     minimum separation (in ms) between framestamps
-                        (SSA/ASS only)
+                        (SSA/ASS output only)
   -l [language code], --lang [language code]
-                        subtitle language code ('en', 'es', etc,). Used with
-                        the language filter
+                        subtitle language code ('en', 'es', etc,). It's used
+                        by the language filter
   -a [number], --video-aspect [number]
                         the aspect ratio of the video. It's used to calculate
                         the correct PlayResY and PlayResY options for the SSA
                         style. Default: 16/9
-  -ncf, --no-cosmetic-filter
-                        disables a filter which makes some cosmetic changes,
+  --no-cosmetic-fix     disables a filter which makes some cosmetic changes,
                         like adding a space after the symbol '-' and the next
                         word
-  -nlf, --no-language-filter
-                        disables a filter which may fix some wrong characters
+  --no-language-fix     disables a filter which can fix some wrong characters
                         in some specific languages
   -c [encoding], --charset [encoding]
                         the encoding of the input file
-  -v, --version         displays the version of this application
+  --output-format [srt or ssa]
+                        output format to use if an output file has not been
+                        set
+  -v, --version         displays the version of this application and exits
 ```
+If multiple subtitle files are supplied, the application will create the
+output files using the input filenames, replacing the extension with srt or ssa.
+Be carefull, if a file with the same output name already exists the application
+will overwrite it without asking.
+
+If an output filename is specified with the -o option, then only the first of
+the input files will be converted, using the output filename.
+
 
 ### Common use cases
 
 Simple conversion:
 ```
-./ttml2ssa.py subtitle_from_netflix.xml subtitle.ssa
+ttml2ssa subtitle_from_netflix.xml -o subtitle.ssa
 ```
 or
 ```
-./ttml2ssa.py subtitle_from_netflix.xml subtitle.srt
+ttml2ssa subtitle_from_netflix.xml -o subtitle.srt
 ```
 
 Shift everything forward by 2 secs:
 ```
-./ttml2ssa.py -s 2000 subtitle_from_netflix.xml subtitle.srt
+ttml2ssa --shift 2000 subtitle_from_netflix.xml -o subtitle.srt
 ```
 
 Convert from one frame rate to another:
 ```
-./ttml2ssa.py -sf 23.976/25 subtitle_from_netflix.xml subtitle.srt
+ttml2ssa --scale-factor 23.976/25 subtitle_from_netflix.xml -o subtitle.srt
 ```
 or
 ```
-./ttml2ssa.py -sf NTSC2PAL subtitle_from_netflix.xml subtitle.srt
+ttml2ssa.py --scale-factor NTSC2PAL subtitle_from_netflix.xml -o subtitle.srt
 ```
-
 Those examples will convert a subtitle made for a movie at 23.976 frames per second for a version sped up to 25 fps (very common in Europe).
+
+Convert two subtitles:
+```
+ttml2ssa.py subtitle1.xml subtitle2.xml
+```
+That will convert the subtitles to subtitle1.ssa and subtitle2.ssa
+
+Convert all subtitles in a folder:
+```
+ttml2ssa.py *.xml
+```
+All files with extersion xml will be converted to ssa.
 
 ### Library
 ttml2ssa.py can also be used as a library for other applications.
