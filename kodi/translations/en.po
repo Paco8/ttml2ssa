@@ -96,3 +96,11 @@ msgstr ""
 msgctxt "#32019"
 msgid "Italic"
 msgstr ""
+
+msgctxt "#32020"
+msgid "Allow italics"
+msgstr ""
+
+msgctxt "#32021"
+msgid "Allow text on the top"
+msgstr ""

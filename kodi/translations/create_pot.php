@@ -32,7 +32,8 @@ $l = array('SSA Style',
            'Allow cosmetic changes', 'Allow fixes for some languages',
            'Timestamp minimum separation (SSA only) in ms',
            'Outline with shadow', 'Opaque box',
-           'Bold', 'Italic');
+           'Bold', 'Italic',
+           'Allow italics', 'Allow text on the top');
 
 foreach ($l as $i) {
 	echo "msgctxt \"#$n\"\n";

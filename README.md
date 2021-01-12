@@ -12,6 +12,7 @@ optional arguments:
   -h, --help            show this help message and exit
   -o [output file], --output [output file]
                         output file with extension srt, ssa or ass
+  -v, --version         displays the version of this application and exits
   --shift [ms]          increases all timestamps by the specified value. You
                         can use a negative number
   --scale-factor [number or label]
@@ -38,7 +39,23 @@ optional arguments:
   --output-format [srt or ssa]
                         output format to use if an output file has not been
                         set
-  -v, --version         displays the version of this application and exits
+  -srt, --srt           equivalent to --output_format srt
+  --no-italics          removes the italic tags from the dialog texts
+  --no-top              all dialog will be displayed at the bottom of the
+                        screen
+  --ssa-fontname [font]
+                        the font name (default: arial)
+  --ssa-fontsize [number]
+                        the font size (default: 50)
+  --ssa-primary-color [color]
+                        the primary color in format AABBGGRR or color name
+                        (default: white)
+  --ssa-back-color [color]
+                        the back color in format AABBGGRR or color name
+                        (default: 40000000)
+  --ssa-outline-color [color]
+                        the outline color in format AABBGGRR or color name
+                        (default: black)
 ```
 If multiple subtitle files are supplied, the application will create the
 output files using the input filenames, replacing the extension with srt or ssa.

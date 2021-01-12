@@ -96,3 +96,11 @@ msgstr "Negrita"
 msgctxt "#32019"
 msgid "Italic"
 msgstr "Cursiva"
+
+msgctxt "#32020"
+msgid "Allow italics"
+msgstr "Permitir cursivas"
+
+msgctxt "#32021"
+msgid "Allow text on the top"
+msgstr "Permitir texto en la parte superior"

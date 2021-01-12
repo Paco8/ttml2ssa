@@ -20,7 +20,7 @@ from timestampconverter import TimestampConverter
 
 class Ttml2Ssa(object):
 
-    VERSION = '0.1.9'
+    VERSION = '0.1.10'
 
     TIME_BASES = [
         'media',
@@ -46,6 +46,9 @@ class Ttml2Ssa(object):
         self.ssa_timestamp_min_sep = 200
         self.use_cosmetic_filter = True
         self.use_language_filter = True
+
+        self.allow_italics = True
+        self.allow_top_pos = True
 
         self._styles = {}
         self._italic_style_ids = []
@@ -363,8 +366,13 @@ class Ttml2Ssa(object):
         entry_count = 1
         for entry in entries:
             text = entry['text'].replace("\n", "\r\n")
-            if entry['position'] == 'top':
+
+            if not self.allow_italics:
+                text = re.sub(r'<i>|</i>', '', text)
+
+            if self.allow_top_pos and entry['position'] == 'top':
                 text = Ttml2Ssa.TOP_MARKER + text
+
             res += srt_format_str.format(entry_count, \
                                          self._tc.ms_to_subrip(entry['ms_begin']), \
                                          self._tc.ms_to_subrip(entry['ms_end']), \
@@ -389,9 +397,14 @@ class Ttml2Ssa(object):
         res = ""
         for entry in entries:
             text = entry['text']
+            if not self.allow_italics:
+                text = re.sub(r'<i>|</i>', '', text)
+
             text = text.replace("\n", "\\N").replace("<i>", "{\i1}").replace("</i>", "{\i0}")
-            if entry['position'] == 'top':
+
+            if self.allow_top_pos and entry['position'] == 'top':
                 text = Ttml2Ssa.TOP_MARKER + text
+
             res += ssa_format_str.format(self._tc.ms_to_ssa(entry['ms_begin']), self._tc.ms_to_ssa(entry['ms_end']), text)
         return res
 
@@ -541,6 +554,25 @@ class Ttml2Ssa(object):
                 camel += c
         return camel
 
+    @staticmethod
+    def color(text):
+        text = text.upper()
+        if text.startswith('#'): text = text[1:]
+        color_names = {
+            # In BBGGRR
+            'WHITE': 'FFFFFF',
+            'GRAY': '808080',
+            'YELLOW': '00FFFF',
+            'RED': '0000FF',
+            'GREEN': '00FF00',
+            'BLUE': 'FF0000',
+            'BROWN': '2A2AA5',
+            'BLACK': '000000'
+        }
+        if text in color_names:
+            text = color_names[text]
+        if len(text) == 6: text = '00' + text
+        return "&H" + text
 
 class Ttml2SsaAddon(Ttml2Ssa):
     def __init__(self, shift = 0, source_fps = 23.976, scale_factor = 1, subtitle_language = None):
@@ -549,9 +581,9 @@ class Ttml2SsaAddon(Ttml2Ssa):
         self.addon = xbmcaddon.Addon('script.module.ttml2ssa')
         self.ssa_style["Fontname"] = self.addon.getSetting('fontname')
         self.ssa_style["Fontsize"] = self.addon.getSettingInt('fontsize')
-        self.ssa_style["PrimaryColour"] = "&H" + self.addon.getSetting('primarycolor')
-        self.ssa_style["BackColour"] = "&H" + self.addon.getSetting('backcolor')
-        self.ssa_style["OutlineColour"] = "&H" + self.addon.getSetting('outlinecolor')
+        self.ssa_style["PrimaryColour"] = Ttml2SsaAddon.color(self.addon.getSetting('primarycolor'))
+        self.ssa_style["BackColour"] = Ttml2SsaAddon.color(self.addon.getSetting('backcolor'))
+        self.ssa_style["OutlineColour"] = Ttml2SsaAddon.color(self.addon.getSetting('outlinecolor'))
         self.ssa_style["BorderStyle"] = 1 if self.addon.getSettingInt('borderstyle') == 0 else 3
         self.ssa_style["Outline"] = self.addon.getSettingInt('outline')
         self.ssa_style["Shadow"] = self.addon.getSettingInt('shadow')
@@ -563,6 +595,8 @@ class Ttml2SsaAddon(Ttml2Ssa):
         self.use_cosmetic_filter = self.addon.getSettingBool('cosmetic_filter')
         self.use_language_filter = self.addon.getSettingBool('language_filter')
         self.ssa_timestamp_min_sep = self.addon.getSettingInt('min_sep')
+        self.allow_italics = self.addon.getSettingBool('allow_italics')
+        self.allow_top_pos = self.addon.getSettingBool('allow_top_pos')
         self._printinfo("SSA style: {}".format(self.ssa_style))
         self._printinfo("Cosmetic filter: {}".format("enabled" if self.use_cosmetic_filter else "disabled"))
         self._printinfo("Language filter: {}".format("enabled" if self.use_language_filter else "disabled"))

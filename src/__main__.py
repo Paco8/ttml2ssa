@@ -23,6 +23,10 @@ if __name__ == '__main__':
         nargs='?',
         help='output file with extension srt, ssa or ass',
         action='store')
+    argparser.add_argument('-v', '--version',
+        dest="version",
+        help="displays the version of this application and exits",
+        action='store_true')
     argparser.add_argument('--shift',
         dest='shift',
         help='increases all timestamps by the specified value. You can use a negative number',
@@ -78,10 +82,51 @@ if __name__ == '__main__':
         help='output format to use if an output file has not been set',
         default='ssa', choices=['srt', 'ssa'],
         action='store')
-    argparser.add_argument('-v', '--version',
-        dest="version",
-        help="displays the version of this application and exits",
-        action='store_true')
+    argparser.add_argument('-srt', '--srt',
+        dest='output_format',
+        help='equivalent to --output_format srt',
+        const='srt',
+        action='store_const')
+    argparser.add_argument('--no-italics',
+        dest='allow_italics',
+        help='removes the italic tags from the dialog texts',
+        action='store_false')
+    argparser.add_argument('--no-top',
+        dest='allow_top_pos',
+        help='all dialog will be displayed at the bottom of the screen',
+        action='store_false')
+
+    argparser.add_argument('--ssa-fontname',
+        dest='fontname', metavar='font',
+        help='the font name (default: arial)',
+        nargs='?',
+        default='Arial', type=str,
+        action='store')
+    argparser.add_argument('--ssa-fontsize',
+        dest='fontsize', metavar='number',
+        help='the font size (default: 50)',
+        nargs='?',
+        default=50, type=int,
+        action='store')
+    argparser.add_argument('--ssa-primary-color',
+        dest='primary_color', metavar='color',
+        help='the primary color in format AABBGGRR or color name (default: white)',
+        nargs='?',
+        default='white', type=str,
+        action='store')
+    argparser.add_argument('--ssa-back-color',
+        dest='back_color', metavar='color',
+        help='the back color in format AABBGGRR or color name (default: 40000000)',
+        nargs='?',
+        default='40000000', type=str,
+        action='store')
+    argparser.add_argument('--ssa-outline-color',
+        dest='outline_color', metavar='color',
+        help='the outline color in format AABBGGRR or color name (default: black)',
+        nargs='?',
+        default='black', type=str,
+        action='store')
+
     args = argparser.parse_args()
 
     if args.scale in Ttml2Ssa.SCALE.keys():
@@ -94,7 +139,15 @@ if __name__ == '__main__':
     ttml.ssa_timestamp_min_sep = args.ssa_timestamp_min_sep
     ttml.use_cosmetic_filter = args.cosmetic_fix
     ttml.use_language_filter = args.language_fix
+    ttml.allow_italics = args.allow_italics
+    ttml.allow_top_pos = args.allow_top_pos
     ttml.set_video_aspect_ratio(eval(args.aspect));
+
+    ttml.ssa_style["Fontname"] = args.fontname
+    ttml.ssa_style["Fontsize"] = args.fontsize
+    ttml.ssa_style["PrimaryColour"] = ttml.color(args.primary_color)
+    ttml.ssa_style["BackColour"] = ttml.color(args.back_color)
+    ttml.ssa_style["OutlineColour"] = ttml.color(args.outline_color)
 
     if args.version:
         print("ttml2ssa version {}".format(ttml.VERSION))
@@ -102,10 +155,10 @@ if __name__ == '__main__':
 
     input_files = getattr(args, 'input-files')
     output_file = getattr(args, 'output-file')
-    
+
     if output_file and len(input_files) > 1:
-        input_files = (input_files[0],)
-    
+        del input_files[1:]
+
     if not input_files:
         argparser.print_usage()
 
@@ -119,4 +172,3 @@ if __name__ == '__main__':
         print("Converting {} to {}".format(input_file, output))
         ttml.parse_subtitle_file(input_file, args.encoding)
         ttml.write2file(output)
-
