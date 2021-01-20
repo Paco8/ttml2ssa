@@ -20,7 +20,7 @@ from timestampconverter import TimestampConverter
 
 class Ttml2Ssa(object):
 
-    VERSION = '0.1.10'
+    VERSION = '0.1.11'
 
     TIME_BASES = [
         'media',
@@ -337,12 +337,13 @@ class Ttml2Ssa(object):
         while i < len(lines):
             line = lines[i].strip()
             i += 1
-            m = re.match('(?P<t1>\d{2}:\d{2}:\d{2}[\.,]\d{3})\s-->\s(?P<t2>\d{2}:\d{2}:\d{2}[\.,]\d{3})(?:.*(?P<pos>start|end))?', line)
+            m = re.match('(?P<t1>\d{2}:\d{2}:\d{2}[\.,]\d{3})\s-->\s(?P<t2>\d{2}:\d{2}:\d{2}[\.,]\d{3})(?:.*(line:(?P<pos>[0-9.]+?))%)?', line)
             if m:
                 entry = {}
+                pos = float(m.group('pos')) if m.group('pos') else 100
                 entry['ms_begin'] = self._tc.timeexpr_to_ms(m.group('t1').replace(',', '.'))
                 entry['ms_end'] = self._tc.timeexpr_to_ms(m.group('t2').replace(',', '.'))
-                entry['position'] = 'top' if m.group('pos') == 'start' else 'bottom'
+                entry['position'] = 'top' if pos < 50 else 'bottom'
                 text = ""
                 while i < len(lines):
                     line = lines[i].strip()
@@ -352,6 +353,7 @@ class Ttml2Ssa(object):
                         text += line
                     else:
                         break
+                text = re.sub(r'<[/]??c\..*?>', '', text)
                 entry['text'] = text
                 self.entries.append(entry)
         self._apply_options()
@@ -517,6 +519,32 @@ class Ttml2Ssa(object):
 
         return contents
 
+    def string_to_color(self, text):
+        text = text.upper()
+        if text.startswith('#'): text = text[1:]
+        color_names = {
+            # In BBGGRR
+            'WHITE': 'FFFFFF',
+            'GRAY': '808080',
+            'YELLOW': '00FFFF',
+            'RED': '0000FF',
+            'GREEN': '00FF00',
+            'BLUE': 'FF0000',
+            'BROWN': '2A2AA5',
+            'BLACK': '000000'
+        }
+        if text in color_names:
+            text = color_names[text]
+
+        try:
+            number = int(text, base=16)
+        except:
+            self._printinfo('Warning: color {} is not recognized'.format(text))
+            number = 0xffffff # White
+
+        hex_number = "&H" + format(number, '08x').upper()
+        return hex_number
+
     @staticmethod
     def mfn2subfn(media_filename, lang=None, m_ext=True, format='srt'):
         """Create subtitle filename from media filename
@@ -554,25 +582,6 @@ class Ttml2Ssa(object):
                 camel += c
         return camel
 
-    @staticmethod
-    def color(text):
-        text = text.upper()
-        if text.startswith('#'): text = text[1:]
-        color_names = {
-            # In BBGGRR
-            'WHITE': 'FFFFFF',
-            'GRAY': '808080',
-            'YELLOW': '00FFFF',
-            'RED': '0000FF',
-            'GREEN': '00FF00',
-            'BLUE': 'FF0000',
-            'BROWN': '2A2AA5',
-            'BLACK': '000000'
-        }
-        if text in color_names:
-            text = color_names[text]
-        if len(text) == 6: text = '00' + text
-        return "&H" + text
 
 class Ttml2SsaAddon(Ttml2Ssa):
     def __init__(self, shift = 0, source_fps = 23.976, scale_factor = 1, subtitle_language = None):
@@ -581,9 +590,9 @@ class Ttml2SsaAddon(Ttml2Ssa):
         self.addon = xbmcaddon.Addon('script.module.ttml2ssa')
         self.ssa_style["Fontname"] = self.addon.getSetting('fontname')
         self.ssa_style["Fontsize"] = self.addon.getSettingInt('fontsize')
-        self.ssa_style["PrimaryColour"] = Ttml2SsaAddon.color(self.addon.getSetting('primarycolor'))
-        self.ssa_style["BackColour"] = Ttml2SsaAddon.color(self.addon.getSetting('backcolor'))
-        self.ssa_style["OutlineColour"] = Ttml2SsaAddon.color(self.addon.getSetting('outlinecolor'))
+        self.ssa_style["PrimaryColour"] = self.string_to_color(self.addon.getSetting('primarycolor'))
+        self.ssa_style["BackColour"] = self.string_to_color(self.addon.getSetting('backcolor'))
+        self.ssa_style["OutlineColour"] = self.string_to_color(self.addon.getSetting('outlinecolor'))
         self.ssa_style["BorderStyle"] = 1 if self.addon.getSettingInt('borderstyle') == 0 else 3
         self.ssa_style["Outline"] = self.addon.getSettingInt('outline')
         self.ssa_style["Shadow"] = self.addon.getSettingInt('shadow')

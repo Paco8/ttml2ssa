@@ -145,9 +145,9 @@ if __name__ == '__main__':
 
     ttml.ssa_style["Fontname"] = args.fontname
     ttml.ssa_style["Fontsize"] = args.fontsize
-    ttml.ssa_style["PrimaryColour"] = ttml.color(args.primary_color)
-    ttml.ssa_style["BackColour"] = ttml.color(args.back_color)
-    ttml.ssa_style["OutlineColour"] = ttml.color(args.outline_color)
+    ttml.ssa_style["PrimaryColour"] = ttml.string_to_color(args.primary_color)
+    ttml.ssa_style["BackColour"] = ttml.string_to_color(args.back_color)
+    ttml.ssa_style["OutlineColour"] = ttml.string_to_color(args.outline_color)
 
     if args.version:
         print("ttml2ssa version {}".format(ttml.VERSION))
