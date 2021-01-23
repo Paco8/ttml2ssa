@@ -20,7 +20,7 @@ from timestampconverter import TimestampConverter
 
 class Ttml2Ssa(object):
 
-    VERSION = '0.1.11'
+    VERSION = '0.1.12'
 
     TIME_BASES = [
         'media',
@@ -340,10 +340,9 @@ class Ttml2Ssa(object):
             m = re.match('(?P<t1>\d{2}:\d{2}:\d{2}[\.,]\d{3})\s-->\s(?P<t2>\d{2}:\d{2}:\d{2}[\.,]\d{3})(?:.*(line:(?P<pos>[0-9.]+?))%)?', line)
             if m:
                 entry = {}
-                pos = float(m.group('pos')) if m.group('pos') else 100
                 entry['ms_begin'] = self._tc.timeexpr_to_ms(m.group('t1').replace(',', '.'))
                 entry['ms_end'] = self._tc.timeexpr_to_ms(m.group('t2').replace(',', '.'))
-                entry['position'] = 'top' if pos < 50 else 'bottom'
+                entry['position'] = 'top' if m.group('pos') and float(m.group('pos')) < 50 else 'bottom'
                 text = ""
                 while i < len(lines):
                     line = lines[i].strip()
@@ -353,7 +352,6 @@ class Ttml2Ssa(object):
                         text += line
                     else:
                         break
-                text = re.sub(r'<[/]??c\..*?>', '', text)
                 entry['text'] = text
                 self.entries.append(entry)
         self._apply_options()
@@ -402,7 +400,12 @@ class Ttml2Ssa(object):
             if not self.allow_italics:
                 text = re.sub(r'<i>|</i>', '', text)
 
-            text = text.replace("\n", "\\N").replace("<i>", "{\i1}").replace("</i>", "{\i0}")
+            for tag in [('\n', '\\N'),
+                        ('<i.*?>', '{\i1}'), ('</i>', '{\i0}'),
+                        ('<b.*?>', '{\\\\b1}'), ('</b>', '{\\\\b0}'),
+                        ('<u.*?>', '{\\u1}'), ('</u>', '{\\u0}'),
+                        ('<.*?>', '')]:
+                text = re.sub(tag[0], tag[1], text)
 
             if self.allow_top_pos and entry['position'] == 'top':
                 text = Ttml2Ssa.TOP_MARKER + text
