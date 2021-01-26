@@ -20,7 +20,7 @@ from timestampconverter import TimestampConverter
 
 class Ttml2Ssa(object):
 
-    VERSION = '0.1.12'
+    VERSION = '0.1.13'
 
     TIME_BASES = [
         'media',
@@ -176,8 +176,14 @@ class Ttml2Ssa(object):
             for region in layout_container.getElementsByTagName('region'):
                 region_id = getattr(
                     region.attributes.get('xml:id', {}), 'value', None)
-                if region_id and region.getAttribute('tts:displayAlign') == 'before':
-                    self._top_regions_ids.append(region_id)
+                if region_id:
+                    # Case 1: displayAlign is in layout -> region
+                    if region.getAttribute('tts:displayAlign') == 'before':
+                        self._top_regions_ids.append(region_id)
+                    # Case 2: displayAlign is in layout -> region -> style
+                    for style in region.getElementsByTagName('style'):
+                        if style.getAttribute('tts:displayAlign') == 'before':
+                            self._top_regions_ids.append(region_id)
 
         # Get em <p>s.
         #
