@@ -126,7 +126,14 @@ if __name__ == '__main__':
         nargs='?',
         default='black', type=str,
         action='store')
-
+    argparser.add_argument('--ssa-bold',
+        dest='ssa_bold',
+        help='the font will be in bold',
+        action='store_true')
+    argparser.add_argument('--ssa-italic',
+        dest='ssa_italic',
+        help='the font will be in italic',
+        action='store_true')
     args = argparser.parse_args()
 
     if args.scale in Ttml2Ssa.SCALE.keys():
@@ -148,6 +155,8 @@ if __name__ == '__main__':
     ttml.ssa_style["PrimaryColour"] = ttml.string_to_color(args.primary_color)
     ttml.ssa_style["BackColour"] = ttml.string_to_color(args.back_color)
     ttml.ssa_style["OutlineColour"] = ttml.string_to_color(args.outline_color)
+    ttml.ssa_style["Bold"] = -1 if args.ssa_bold else 0
+    ttml.ssa_style["Italic"] = -1 if args.ssa_italic else 0
 
     if args.version:
         print("ttml2ssa version {}".format(ttml.VERSION))
