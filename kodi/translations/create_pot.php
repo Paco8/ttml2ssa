@@ -1,6 +1,4 @@
 #!/usr/bin/php -q
-<?php
-?>
 # XBMC Media Center language file
 # Addon Name: Ttml2Ssa
 # Addon id: script.module.ttml2ssa
@@ -21,25 +19,35 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 
 <?php
-$n = 32000;
-
-$l = array('SSA Style', 
-           'Font name', 'Font size', 
-           'Primary colour (AABBGGRR)', 'Back colour (AABBGGRR)', 'Outline colour (AABBGGRR)',
-           'Border style', 'Outline', 'Shadow',
-           'Vertical margin', 'Left margin', 'Right margin',
-           'Misc',
-           'Allow cosmetic changes', 'Allow fixes for some languages',
-           'Timestamp minimum separation (SSA only) in ms',
-           'Outline with shadow', 'Opaque box',
-           'Bold', 'Italic',
-           'Allow italics', 'Allow text on the top');
-
-foreach ($l as $i) {
-	echo "msgctxt \"#$n\"\n";
-	echo "msgid \"$i\"\n";
-	echo "msgstr \"\"\n\n";
-
-	$n++;
+function print_section($l, $n) {
+    foreach ($l as $i) {
+        echo "msgctxt \"#$n\"\n";
+        echo "msgid \"$i\"\n";
+        echo "msgstr \"\"\n\n";
+        $n++;
+    }
 }
+
+$style =  array('SSA Style', 
+            'Font name', 'Font size', 
+            'Primary colour (AABBGGRR)', 'Back colour (AABBGGRR)', 'Outline colour (AABBGGRR)',
+            'Border style',
+            'Outline with shadow', 'Opaque box',
+            'Outline', 'Shadow',
+            'Bold', 'Italic',       
+            'Vertical margin', 'Left margin', 'Right margin');
+
+$misc = array('Misc',
+            'Allow italics', 'Allow text on the top',
+            'Allow cosmetic changes', 'Allow fixes for some languages',
+            'Timestamp minimum separation (SSA only) in ms');
+
+$addons = array('Subtitle type',
+            'SSA Settings', 
+            'Improved (SSA) subtitles',
+            'Normal (SRT)', 'Improved (SSA)', 'Both');
+
+print_section($style, 32000);
+print_section($misc, 32100);
+print_section($addons, 32200);
 ?>

@@ -46,61 +46,85 @@ msgid "Border style"
 msgstr ""
 
 msgctxt "#32007"
-msgid "Outline"
-msgstr ""
-
-msgctxt "#32008"
-msgid "Shadow"
-msgstr ""
-
-msgctxt "#32009"
-msgid "Vertical margin"
-msgstr ""
-
-msgctxt "#32010"
-msgid "Left margin"
-msgstr ""
-
-msgctxt "#32011"
-msgid "Right margin"
-msgstr ""
-
-msgctxt "#32012"
-msgid "Misc"
-msgstr ""
-
-msgctxt "#32013"
-msgid "Allow cosmetic changes"
-msgstr ""
-
-msgctxt "#32014"
-msgid "Allow fixes for some languages"
-msgstr ""
-
-msgctxt "#32015"
-msgid "Timestamp minimum separation (SSA only) in ms"
-msgstr ""
-
-msgctxt "#32016"
 msgid "Outline with shadow"
 msgstr ""
 
-msgctxt "#32017"
+msgctxt "#32008"
 msgid "Opaque box"
 msgstr ""
 
-msgctxt "#32018"
+msgctxt "#32009"
+msgid "Outline"
+msgstr ""
+
+msgctxt "#32010"
+msgid "Shadow"
+msgstr ""
+
+msgctxt "#32011"
 msgid "Bold"
 msgstr ""
 
-msgctxt "#32019"
+msgctxt "#32012"
 msgid "Italic"
 msgstr ""
 
-msgctxt "#32020"
+msgctxt "#32013"
+msgid "Vertical margin"
+msgstr ""
+
+msgctxt "#32014"
+msgid "Left margin"
+msgstr ""
+
+msgctxt "#32015"
+msgid "Right margin"
+msgstr ""
+
+msgctxt "#32100"
+msgid "Misc"
+msgstr ""
+
+msgctxt "#32101"
 msgid "Allow italics"
 msgstr ""
 
-msgctxt "#32021"
+msgctxt "#32102"
 msgid "Allow text on the top"
+msgstr ""
+
+msgctxt "#32103"
+msgid "Allow cosmetic changes"
+msgstr ""
+
+msgctxt "#32104"
+msgid "Allow fixes for some languages"
+msgstr ""
+
+msgctxt "#32105"
+msgid "Timestamp minimum separation (SSA only) in ms"
+msgstr ""
+
+msgctxt "#32200"
+msgid "Subtitle type"
+msgstr ""
+
+msgctxt "#32201"
+msgid "SSA Settings"
+msgstr ""
+
+msgctxt "#32202"
+msgid "Improved (SSA) subtitles"
+msgstr ""
+
+msgctxt "#32203"
+msgid "Normal (SRT)"
+msgstr ""
+
+msgctxt "#32204"
+msgid "Improved (SSA)"
+msgstr ""
+
+msgctxt "#32205"
+msgid "Both"
 msgstr ""

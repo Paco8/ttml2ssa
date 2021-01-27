@@ -20,7 +20,7 @@ from timestampconverter import TimestampConverter
 
 class Ttml2Ssa(object):
 
-    VERSION = '0.1.13'
+    VERSION = '0.1.14'
 
     TIME_BASES = [
         'media',
@@ -406,10 +406,10 @@ class Ttml2Ssa(object):
             if not self.allow_italics:
                 text = re.sub(r'<i>|</i>', '', text)
 
-            for tag in [('\n', '\\N'),
-                        ('<i.*?>', '{\i1}'), ('</i>', '{\i0}'),
+            for tag in [('\n', '\\\\N'),
+                        ('<i.*?>', '{\\\i1}'), ('</i>', '{\\\i0}'),
                         ('<b.*?>', '{\\\\b1}'), ('</b>', '{\\\\b0}'),
-                        ('<u.*?>', '{\\u1}'), ('</u>', '{\\u0}'),
+                        ('<u.*?>', '{\\\\u1}'), ('</u>', '{\\\\u0}'),
                         ('<.*?>', '')]:
                 text = re.sub(tag[0], tag[1], text)
 
