@@ -114,8 +114,8 @@ msgid "SSA Settings"
 msgstr "Configuración SSA"
 
 msgctxt "#32202"
-msgid "Improved (SSA) subtitles"
-msgstr "Subtítulos mejorados (SSA)"
+msgid "Improved subtitles"
+msgstr "Subtítulos mejorados"
 
 msgctxt "#32203"
 msgid "Normal (SRT)"
@@ -128,3 +128,4 @@ msgstr "Mejorado (SSA)"
 msgctxt "#32205"
 msgid "Both"
 msgstr "Ambos"
+
