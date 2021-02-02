@@ -18,8 +18,9 @@ install: ../src/ttml2ssa.py ../src/timestampconverter.py addon.xml-k18 addon.xml
 	install -m 644 translations/en.po $(OUTPUT_DIR)/resources/language/resource.language.en_gb/strings.po
 	install -m 644 translations/es.po $(OUTPUT_DIR)/resources/language/resource.language.es_es/strings.po
 
-	#zip -9 -r script.module.ttml2ssa-$(VERSION).zip $(OUTPUT_DIR)/
+	zip -9 -r script.module.ttml2ssa-$(VERSION).zip $(OUTPUT_DIR)/ -x \*k18 \*k19
 
 clean:
 	-rm -r $(OUTPUT_DIR)
+	-rm script.module.ttml2ssa-*.zip
 	cd translations && make clean

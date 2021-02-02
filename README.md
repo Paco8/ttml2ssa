@@ -56,6 +56,8 @@ optional arguments:
   --ssa-outline-color [color]
                         the outline color in format AABBGGRR or color name
                         (default: black)
+  --ssa-bold            the font will be in bold
+  --ssa-italic          the font will be in italic
 ```
 If multiple subtitle files are supplied, the application will create the
 output files using the input filenames, replacing the extension with srt or ssa.

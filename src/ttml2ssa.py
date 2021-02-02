@@ -20,7 +20,7 @@ from timestampconverter import TimestampConverter
 
 class Ttml2Ssa(object):
 
-    VERSION = '0.1.14'
+    VERSION = '0.1.15'
 
     TIME_BASES = [
         'media',
