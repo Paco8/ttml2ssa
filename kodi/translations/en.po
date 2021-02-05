@@ -81,6 +81,10 @@ msgctxt "#32015"
 msgid "Right margin"
 msgstr ""
 
+msgctxt "#32016"
+msgid "Main"
+msgstr ""
+
 msgctxt "#32100"
 msgid "Misc"
 msgstr ""
@@ -110,7 +114,7 @@ msgid "Subtitle type"
 msgstr ""
 
 msgctxt "#32201"
-msgid "SSA Settings"
+msgid "Improved Subtitles Settings"
 msgstr ""
 
 msgctxt "#32202"

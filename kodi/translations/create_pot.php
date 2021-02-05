@@ -35,7 +35,8 @@ $style =  array('SSA Style',
             'Outline with shadow', 'Opaque box',
             'Outline', 'Shadow',
             'Bold', 'Italic',
-            'Vertical margin', 'Left margin', 'Right margin');
+            'Vertical margin', 'Left margin', 'Right margin',
+            'Main');
 
 $misc = array('Misc',
             'Allow italics', 'Allow text on the top',
@@ -43,7 +44,7 @@ $misc = array('Misc',
             'Timestamp minimum separation (SSA only) in ms');
 
 $addons = array('Subtitle type',
-            'SSA Settings',
+            'Improved Subtitles Settings',
             'Improved subtitles',
             'Normal (SRT)', 'Improved (SSA)', 'Both');
 

@@ -81,6 +81,10 @@ msgctxt "#32015"
 msgid "Right margin"
 msgstr "Margen derecho"
 
+msgctxt "#32016"
+msgid "Main"
+msgstr "Principal"
+
 msgctxt "#32100"
 msgid "Misc"
 msgstr "Misc"
@@ -110,8 +114,8 @@ msgid "Subtitle type"
 msgstr "Tipo de subtítulo"
 
 msgctxt "#32201"
-msgid "SSA Settings"
-msgstr "Configuración SSA"
+msgid "Improved Subtitles Settings"
+msgstr "Configuración subtítulos mejorados"
 
 msgctxt "#32202"
 msgid "Improved subtitles"
@@ -129,3 +133,6 @@ msgctxt "#32205"
 msgid "Both"
 msgstr "Ambos"
 
+#~ msgctxt "#32201"
+#~ msgid "SSA Settings"
+#~ msgstr "Configuración SSA"

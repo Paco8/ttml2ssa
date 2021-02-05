@@ -7,20 +7,21 @@
 
 from __future__ import unicode_literals, absolute_import, division
 
+import re
+import os.path
+from collections import OrderedDict
+
 try:
     from defusedxml import minidom  # type: ignore
 except:
     from xml.dom import minidom
 
-import re
-import os.path
-from collections import OrderedDict
 from timestampconverter import TimestampConverter
 
 
 class Ttml2Ssa(object):
 
-    VERSION = '0.1.15'
+    VERSION = '0.1.16'
 
     TIME_BASES = [
         'media',
@@ -38,7 +39,7 @@ class Ttml2Ssa(object):
 
     TOP_MARKER = '{\\an8}'
 
-    def __init__(self, shift = 0, source_fps = 23.976, scale_factor = 1, subtitle_language = None):
+    def __init__(self, shift=0, source_fps=23.976, scale_factor=1, subtitle_language=None):
         self.shift = shift
         self.source_fps = source_fps
         self.subtitle_language = subtitle_language
@@ -80,7 +81,7 @@ class Ttml2Ssa(object):
         """ Adjust the SSA options PlaResX and PlayRexY according to the aspect ratio of the video """
         self.ssa_playresy = int(self.ssa_playresx / ratio)
 
-    def parse_subtitle_file(self, filename, file_encoding = None):
+    def parse_subtitle_file(self, filename, file_encoding=None):
         """Read and parse a subtitle file.
         If the file has the vtt or srt extension it will be parsed as a vtt. Otherwise it will be parsed as ttml.
         The result is stored in the `entries` list, as begin (ms), end (ms), text, position.
@@ -92,7 +93,7 @@ class Ttml2Ssa(object):
         else:
             self.parse_ttml_file(filename, file_encoding)
 
-    def parse_ttml_file(self, filename, file_encoding = None):
+    def parse_ttml_file(self, filename, file_encoding=None):
         """Read and parse a ttml/xml/dfxp file.
         The result is stored in the `entries` list, as begin (ms), end (ms), text, position.
         """
@@ -322,7 +323,7 @@ class Ttml2Ssa(object):
         return ms_begin, ms_end, dialogue, position
 
 
-    def parse_vtt_file(self, filename, file_encoding = None):
+    def parse_vtt_file(self, filename, file_encoding=None):
         """Read and parse a vtt/srt file.
         The result is stored in the `entries` list, as begin (ms), end (ms), text, position.
         """
@@ -343,7 +344,7 @@ class Ttml2Ssa(object):
         while i < len(lines):
             line = lines[i].strip()
             i += 1
-            m = re.match('(?P<t1>\d{2}:\d{2}:\d{2}[\.,]\d{3})\s-->\s(?P<t2>\d{2}:\d{2}:\d{2}[\.,]\d{3})(?:.*(line:(?P<pos>[0-9.]+?))%)?', line)
+            m = re.match(r'(?P<t1>\d{2}:\d{2}:\d{2}[\.,]\d{3})\s-->\s(?P<t2>\d{2}:\d{2}:\d{2}[\.,]\d{3})(?:.*(line:(?P<pos>[0-9.]+?))%)?', line)
             if m:
                 entry = {}
                 entry['ms_begin'] = self._tc.timeexpr_to_ms(m.group('t1').replace(',', '.'))
@@ -386,14 +387,14 @@ class Ttml2Ssa(object):
             entry_count += 1
         return res
 
-    def _paragraphs_to_ssa(self, timestamp_min_sep = 200):
+    def _paragraphs_to_ssa(self, timestamp_min_sep=200):
         entries = sorted(self.entries, key=lambda x: x['ms_begin'])
 
-        if (timestamp_min_sep > 0 and len(self.entries) > 1):
+        if timestamp_min_sep > 0 and len(self.entries) > 1:
             i = 1
             while i < len(entries):
-                diff =  entries[i]['ms_begin'] - entries[i-1]['ms_end']
-                if (diff < timestamp_min_sep):
+                diff = entries[i]['ms_begin'] - entries[i-1]['ms_end']
+                if diff < timestamp_min_sep:
                     s = round((timestamp_min_sep - diff) / 2)
                     entries[i]['ms_begin'] += s
                     entries[i-1]['ms_end'] -= s
@@ -407,7 +408,7 @@ class Ttml2Ssa(object):
                 text = re.sub(r'<i>|</i>', '', text)
 
             for tag in [('\n', '\\\\N'),
-                        ('<i.*?>', '{\\\i1}'), ('</i>', '{\\\i0}'),
+                        ('<i.*?>', '{\\\\i1}'), ('</i>', '{\\\\i0}'),
                         ('<b.*?>', '{\\\\b1}'), ('</b>', '{\\\\b0}'),
                         ('<u.*?>', '{\\\\u1}'), ('</u>', '{\\\\u0}'),
                         ('<.*?>', '')]:
@@ -442,19 +443,19 @@ class Ttml2Ssa(object):
     def _shift_timestamps(self, milliseconds):
         self._printinfo("Shifting {} milliseconds".format(milliseconds))
         for entry in self.entries:
-            entry['ms_begin'] += milliseconds;
-            entry['ms_end'] += milliseconds;
+            entry['ms_begin'] += milliseconds
+            entry['ms_end'] += milliseconds
 
     def _scale_timestamps(self, multiplier):
         self._printinfo("Scale factor: {}".format(multiplier))
         for entry in self.entries:
-            entry['ms_begin'] *= multiplier;
-            entry['ms_end'] *= multiplier;
+            entry['ms_begin'] *= multiplier
+            entry['ms_end'] *= multiplier
 
     def _cosmetic_filter(self):
         total_count = 0
         for entry in self.entries:
-            entry['text'], n_changes = re.subn('—', '-', entry['text']);
+            entry['text'], n_changes = re.subn('—', '-', entry['text'])
             total_count += n_changes
 
             # Add an space between '-' and the first word
@@ -475,7 +476,7 @@ class Ttml2Ssa(object):
         for entry in self.entries:
             if lang == 'es':
                 for rep in es_replacements:
-                    total_count +=  entry['text'].count(rep[0])
+                    total_count += entry['text'].count(rep[0])
                     entry['text'] = entry['text'].replace(rep[0], rep[1])
             if lang == 'ar':
                 from unicodedata import lookup
@@ -501,12 +502,12 @@ class Ttml2Ssa(object):
 
         import io
         with io.open(output, 'w', encoding='utf-8-sig') as handle:
-            if (extension == '.ssa' or extension == '.ass'):
+            if extension == '.ssa' or extension == '.ass':
                 handle.write(self.generate_ssa())
             else:
                 handle.write(self.generate_srt())
 
-    def _read_file(self, filename, encoding = None):
+    def _read_file(self, filename, encoding=None):
         """ Try to read the file using the supplied encoding (if any), utf-8 and latin-1 """
 
         import io
@@ -524,7 +525,7 @@ class Ttml2Ssa(object):
                     contents = handle.read()
                     break
             except UnicodeDecodeError:
-                 self._printinfo("Error opening {}".format(filename))
+                self._printinfo("Error opening {}".format(filename))
 
         return contents
 
@@ -593,7 +594,7 @@ class Ttml2Ssa(object):
 
 
 class Ttml2SsaAddon(Ttml2Ssa):
-    def __init__(self, shift = 0, source_fps = 23.976, scale_factor = 1, subtitle_language = None):
+    def __init__(self, shift=0, source_fps=23.976, scale_factor=1, subtitle_language=None):
         super(Ttml2SsaAddon, self).__init__(shift, source_fps, scale_factor, subtitle_language)
         import xbmcaddon
         self.addon = xbmcaddon.Addon('script.module.ttml2ssa')
@@ -615,10 +616,20 @@ class Ttml2SsaAddon(Ttml2Ssa):
         self.ssa_timestamp_min_sep = self.addon.getSettingInt('min_sep')
         self.allow_italics = self.addon.getSettingBool('allow_italics')
         self.allow_top_pos = self.addon.getSettingBool('allow_top_pos')
+        self._printinfo("Subtitle type: {}".format(self.subtitle_type()))
         self._printinfo("SSA style: {}".format(self.ssa_style))
         self._printinfo("Cosmetic filter: {}".format("enabled" if self.use_cosmetic_filter else "disabled"))
         self._printinfo("Language filter: {}".format("enabled" if self.use_language_filter else "disabled"))
         self._printinfo("Timestamp minimum separation: {}".format(self.ssa_timestamp_min_sep))
+
+    def subtitle_type(self):
+        return ['srt', 'ssa', 'both'][self.addon.getSettingInt('subtitle_type')]
+
+    @staticmethod
+    def subtitle_type():
+        import xbmcaddon
+        addon = xbmcaddon.Addon('script.module.ttml2ssa')
+        return ['srt', 'ssa', 'both'][addon.getSettingInt('subtitle_type')]
 
     def _printinfo(self, text):
         import xbmc

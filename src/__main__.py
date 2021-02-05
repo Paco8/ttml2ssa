@@ -141,14 +141,14 @@ if __name__ == '__main__':
     else:
         scale_factor = eval(args.scale)
 
-    ttml = Ttml2Ssa(shift=args.shift, scale_factor = scale_factor, subtitle_language = args.lang)
+    ttml = Ttml2Ssa(shift=args.shift, scale_factor=scale_factor, subtitle_language=args.lang)
     #ttml.source_fps = args.sfps
     ttml.ssa_timestamp_min_sep = args.ssa_timestamp_min_sep
     ttml.use_cosmetic_filter = args.cosmetic_fix
     ttml.use_language_filter = args.language_fix
     ttml.allow_italics = args.allow_italics
     ttml.allow_top_pos = args.allow_top_pos
-    ttml.set_video_aspect_ratio(eval(args.aspect));
+    ttml.set_video_aspect_ratio(eval(args.aspect))
 
     ttml.ssa_style["Fontname"] = args.fontname
     ttml.ssa_style["Fontsize"] = args.fontsize
