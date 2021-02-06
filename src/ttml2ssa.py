@@ -21,7 +21,7 @@ from timestampconverter import TimestampConverter
 
 class Ttml2Ssa(object):
 
-    VERSION = '0.1.16'
+    VERSION = '0.1.17'
 
     TIME_BASES = [
         'media',
@@ -596,8 +596,10 @@ class Ttml2Ssa(object):
 class Ttml2SsaAddon(Ttml2Ssa):
     def __init__(self, shift=0, source_fps=23.976, scale_factor=1, subtitle_language=None):
         super(Ttml2SsaAddon, self).__init__(shift, source_fps, scale_factor, subtitle_language)
-        import xbmcaddon
-        self.addon = xbmcaddon.Addon('script.module.ttml2ssa')
+        self.addon = Ttml2SsaAddon._addon()
+        self._load_settings()
+
+    def _load_settings(self):
         self.ssa_style["Fontname"] = self.addon.getSetting('fontname')
         self.ssa_style["Fontsize"] = self.addon.getSettingInt('fontsize')
         self.ssa_style["PrimaryColour"] = self.string_to_color(self.addon.getSetting('primarycolor'))
@@ -623,14 +625,28 @@ class Ttml2SsaAddon(Ttml2Ssa):
         self._printinfo("Timestamp minimum separation: {}".format(self.ssa_timestamp_min_sep))
 
     def subtitle_type(self):
+        """ Return the user's preferred subtitle type.
+        Posible values: srt, ssa, both
+        """
+
         return ['srt', 'ssa', 'both'][self.addon.getSettingInt('subtitle_type')]
 
     @staticmethod
-    def subtitle_type():
+    def _addon():
         import xbmcaddon
-        addon = xbmcaddon.Addon('script.module.ttml2ssa')
+        return xbmcaddon.Addon('script.module.ttml2ssa')
+
+    @staticmethod
+    def subtitle_type():
+        """ Return the user's preferred subtitle type.
+        Posible values: srt, ssa, both
+        """
+
+        addon = Ttml2SsaAddon._addon()
         return ['srt', 'ssa', 'both'][addon.getSettingInt('subtitle_type')]
 
     def _printinfo(self, text):
+        """ Print info in the kodi log """
+
         import xbmc
         xbmc.log("Ttml2Ssa: {}".format(text), xbmc.LOGINFO)
