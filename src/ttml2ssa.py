@@ -21,7 +21,7 @@ from timestampconverter import TimestampConverter
 
 class Ttml2Ssa(object):
 
-    VERSION = '0.1.17'
+    VERSION = '0.1.18'
 
     TIME_BASES = [
         'media',
@@ -367,6 +367,7 @@ class Ttml2Ssa(object):
         """Return a string with the generated subtitle document in srt format."""
 
         entries = sorted(self.entries, key=lambda x: x['ms_begin'])
+        entries = self._sequalize(entries)
 
         srt_format_str = '{}\r\n{} --> {}\r\n{}\r\n\r\n'
         res = ''
@@ -389,6 +390,7 @@ class Ttml2Ssa(object):
 
     def _paragraphs_to_ssa(self, timestamp_min_sep=200):
         entries = sorted(self.entries, key=lambda x: x['ms_begin'])
+        entries = self._sequalize(entries)
 
         if timestamp_min_sep > 0 and len(self.entries) > 1:
             i = 1
@@ -487,6 +489,27 @@ class Ttml2Ssa(object):
                 total_count += entry['text'].count(',')
                 entry['text'] = entry['text'].replace('?', '؟').replace(',', '،')
         self._printinfo("Replacements for language '{}': {}".format(lang, total_count))
+
+    def _sequalize(self, entries):
+        """ Combine parallel paragraphs """
+
+        total_count = 0
+        res = []
+
+        for i in range(len(entries)):
+            if i > 0 and (entries[i]['ms_begin'] == entries[i-1]['ms_begin']) and \
+                         (entries[i]['ms_end'] == entries[i-1]['ms_end']):
+                entry = res.pop()
+                entry['text'] += '\n' + entries[i]['text']
+                res.append(entry)
+                total_count += 1
+            else:
+                res.append(entries[i])
+
+        if total_count:
+            self._printinfo("Sequalized entries: {}".format(total_count))
+
+        return res
 
     def _printinfo(self, text):
         print(text)
