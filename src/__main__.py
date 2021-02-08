@@ -48,10 +48,6 @@ if __name__ == '__main__':
              'NTSC2FILM (23.976/24), PAL2FILM (25/24), '
              'FILM2NTSC (24/23.976), FILM2PAL (24/25)',
         nargs='?', type=str, default='1', action='store')
-    argparser.add_argument('--min-sep-ms',
-        dest="ssa_timestamp_min_sep", metavar="ms",
-        help="minimum separation (in ms) between framestamps (SSA/ASS output only)",
-        nargs="?", type=int, default=200, action='store')
     argparser.add_argument('-l', '--lang',
         dest="lang", metavar="language code",
         help="subtitle language code ('en', 'es', etc,). It's used by the language filter",
@@ -96,44 +92,58 @@ if __name__ == '__main__':
         help='all dialog will be displayed at the bottom of the screen',
         action='store_false')
 
-    argparser.add_argument('--ssa-fontname',
+    argparser.add_argument('--ssa-fontname', '-f',
         dest='fontname', metavar='font',
         help='the font name (default: arial)',
         nargs='?',
         default='Arial', type=str,
         action='store')
-    argparser.add_argument('--ssa-fontsize',
+    argparser.add_argument('--ssa-fontsize', '-fs',
         dest='fontsize', metavar='number',
         help='the font size (default: 50)',
         nargs='?',
         default=50, type=int,
         action='store')
-    argparser.add_argument('--ssa-primary-color',
+    argparser.add_argument('--ssa-primary-color', '-pc',
         dest='primary_color', metavar='color',
         help='the primary color in format AABBGGRR or color name (default: white)',
         nargs='?',
         default='white', type=str,
         action='store')
-    argparser.add_argument('--ssa-back-color',
+    argparser.add_argument('--ssa-back-color', '-bc',
         dest='back_color', metavar='color',
         help='the back color in format AABBGGRR or color name (default: 40000000)',
         nargs='?',
         default='40000000', type=str,
         action='store')
-    argparser.add_argument('--ssa-outline-color',
+    argparser.add_argument('--ssa-outline-color', '-oc',
         dest='outline_color', metavar='color',
         help='the outline color in format AABBGGRR or color name (default: black)',
         nargs='?',
         default='black', type=str,
         action='store')
-    argparser.add_argument('--ssa-bold',
+    argparser.add_argument('--ssa-bold', '-b',
         dest='ssa_bold',
         help='the font will be in bold',
         action='store_true')
-    argparser.add_argument('--ssa-italic',
+    argparser.add_argument('--ssa-italic', '-i',
         dest='ssa_italic',
         help='the font will be in italic',
         action='store_true')
+
+    argparser.add_argument('--no-timestamp-manipulation',
+        dest="timestamp_manipulation",
+        help="no changes will be made on timestamps",
+        action='store_false')
+    argparser.add_argument('--no-fix-collisions',
+        dest="fix_collisions",
+        help="collisions on timestamps won't be fixed",
+        action='store_false')   
+    argparser.add_argument('--min-sep-ms',
+        dest="ssa_timestamp_min_sep", metavar="ms",
+        help="minimum separation (in ms) between framestamps (SSA/ASS output only)",
+        nargs="?", type=int, default=200, action='store')
+
     args = argparser.parse_args()
 
     if args.scale in Ttml2Ssa.SCALE.keys():
@@ -143,11 +153,13 @@ if __name__ == '__main__':
 
     ttml = Ttml2Ssa(shift=args.shift, scale_factor=scale_factor, subtitle_language=args.lang)
     #ttml.source_fps = args.sfps
-    ttml.ssa_timestamp_min_sep = args.ssa_timestamp_min_sep
     ttml.use_cosmetic_filter = args.cosmetic_fix
     ttml.use_language_filter = args.language_fix
     ttml.allow_italics = args.allow_italics
     ttml.allow_top_pos = args.allow_top_pos
+    ttml.allow_timestamp_manipulation = args.timestamp_manipulation
+    ttml.fix_timestamp_collisions = args.fix_collisions
+    ttml.ssa_timestamp_min_sep = args.ssa_timestamp_min_sep
     ttml.set_video_aspect_ratio(eval(args.aspect))
 
     ttml.ssa_style["Fontname"] = args.fontname

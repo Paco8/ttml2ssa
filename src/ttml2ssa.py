@@ -21,7 +21,7 @@ from timestampconverter import TimestampConverter
 
 class Ttml2Ssa(object):
 
-    VERSION = '0.1.18'
+    VERSION = '0.1.19'
 
     TIME_BASES = [
         'media',
@@ -50,6 +50,9 @@ class Ttml2Ssa(object):
 
         self.allow_italics = True
         self.allow_top_pos = True
+
+        self.allow_timestamp_manipulation = True
+        self.fix_timestamp_collisions = True
 
         self._styles = {}
         self._italic_style_ids = []
@@ -219,6 +222,11 @@ class Ttml2Ssa(object):
         if self.use_language_filter:
             self._language_fix_filter()
 
+        # Sort and fix timestamps
+        self.entries = sorted(self.entries, key=lambda x: x['ms_begin'])
+        if self.allow_timestamp_manipulation and self.fix_timestamp_collisions:
+            self.entries = self._sequalize(self.entries)
+
     def _get_tt_style_attrs(self, node, in_head=False):
         """Extract node's style attributes
 
@@ -366,13 +374,10 @@ class Ttml2Ssa(object):
     def generate_srt(self):
         """Return a string with the generated subtitle document in srt format."""
 
-        entries = sorted(self.entries, key=lambda x: x['ms_begin'])
-        entries = self._sequalize(entries)
-
         srt_format_str = '{}\r\n{} --> {}\r\n{}\r\n\r\n'
         res = ''
         entry_count = 1
-        for entry in entries:
+        for entry in self.entries:
             text = entry['text'].replace("\n", "\r\n")
 
             if not self.allow_italics:
@@ -389,18 +394,18 @@ class Ttml2Ssa(object):
         return res
 
     def _paragraphs_to_ssa(self, timestamp_min_sep=200):
-        entries = sorted(self.entries, key=lambda x: x['ms_begin'])
-        entries = self._sequalize(entries)
-
-        if timestamp_min_sep > 0 and len(self.entries) > 1:
-            i = 1
-            while i < len(entries):
+        def fix_timestamps_separation(entries, timestamp_min_sep):
+            for i in range(len(entries)):
+                if i == 0: continue
                 diff = entries[i]['ms_begin'] - entries[i-1]['ms_end']
                 if diff < timestamp_min_sep:
                     s = round((timestamp_min_sep - diff) / 2)
                     entries[i]['ms_begin'] += s
                     entries[i-1]['ms_end'] -= s
-                i += 1
+
+        entries = self.entries[:] # Copy list
+        if self.allow_timestamp_manipulation and timestamp_min_sep > 0:
+            fix_timestamps_separation(entries, timestamp_min_sep)
 
         ssa_format_str = 'Dialogue: 0,{},{},Default,{}\r\n'
         res = ""
@@ -497,9 +502,10 @@ class Ttml2Ssa(object):
         res = []
 
         for i in range(len(entries)):
-            if i > 0 and (entries[i]['ms_begin'] == entries[i-1]['ms_begin']) and \
-                         (entries[i]['ms_end'] == entries[i-1]['ms_end']):
+            if i > 0 and entries[i]['ms_begin'] < entries[i-1]['ms_end']:
                 entry = res.pop()
+                if entries[i]['ms_end'] > entries[i-1]['ms_end']:
+                    entry['ms_end'] = entries[i]['ms_end']
                 entry['text'] += '\n' + entries[i]['text']
                 res.append(entry)
                 total_count += 1
@@ -641,6 +647,8 @@ class Ttml2SsaAddon(Ttml2Ssa):
         self.ssa_timestamp_min_sep = self.addon.getSettingInt('min_sep')
         self.allow_italics = self.addon.getSettingBool('allow_italics')
         self.allow_top_pos = self.addon.getSettingBool('allow_top_pos')
+        self.allow_timestamp_manipulation = self.addon.getSettingBool('timestamp manipulation')
+        self.fix_timestamp_collisions = self.addon.getSettingBool('fix_collisions')
         self._printinfo("Subtitle type: {}".format(self.subtitle_type()))
         self._printinfo("SSA style: {}".format(self.ssa_style))
         self._printinfo("Cosmetic filter: {}".format("enabled" if self.use_cosmetic_filter else "disabled"))

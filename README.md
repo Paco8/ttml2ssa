@@ -20,8 +20,6 @@ optional arguments:
                         also any of these labels: NTSC2PAL (23.976/25),
                         PAL2NTSC (25/23.976), NTSC2FILM (23.976/24), PAL2FILM
                         (25/24), FILM2NTSC (24/23.976), FILM2PAL (24/25)
-  --min-sep-ms [ms]     minimum separation (in ms) between framestamps
-                        (SSA/ASS output only)
   -l [language code], --lang [language code]
                         subtitle language code ('en', 'es', etc,). It's used
                         by the language filter
@@ -43,21 +41,26 @@ optional arguments:
   --no-italics          removes the italic tags from the dialog texts
   --no-top              all dialog will be displayed at the bottom of the
                         screen
-  --ssa-fontname [font]
+  --ssa-fontname [font], -f [font]
                         the font name (default: arial)
-  --ssa-fontsize [number]
+  --ssa-fontsize [number], -fs [number]
                         the font size (default: 50)
-  --ssa-primary-color [color]
+  --ssa-primary-color [color], -pc [color]
                         the primary color in format AABBGGRR or color name
                         (default: white)
-  --ssa-back-color [color]
+  --ssa-back-color [color], -bc [color]
                         the back color in format AABBGGRR or color name
                         (default: 40000000)
-  --ssa-outline-color [color]
+  --ssa-outline-color [color], -oc [color]
                         the outline color in format AABBGGRR or color name
                         (default: black)
-  --ssa-bold            the font will be in bold
-  --ssa-italic          the font will be in italic
+  --ssa-bold, -b        the font will be in bold
+  --ssa-italic, -i      the font will be in italic
+  --no-timestamp-manipulation
+                        no changes will be made on timestamps
+  --no-fix-collisions   collisions on timestamps won't be fixed
+  --min-sep-ms [ms]     minimum separation (in ms) between framestamps
+                        (SSA/ASS output only)
 ```
 If multiple subtitle files are supplied, the application will create the
 output files using the input filenames, replacing the extension with srt or ssa.

@@ -109,6 +109,14 @@ msgctxt "#32105"
 msgid "Timestamp minimum separation (SSA only) in ms"
 msgstr ""
 
+msgctxt "#32106"
+msgid "Allow timestamp manipulation"
+msgstr ""
+
+msgctxt "#32107"
+msgid "Fix collisions"
+msgstr ""
+
 msgctxt "#32200"
 msgid "Subtitle type"
 msgstr ""

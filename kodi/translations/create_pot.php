@@ -41,7 +41,8 @@ $style =  array('SSA Style',
 $misc = array('Misc',
             'Allow italics', 'Allow text on the top',
             'Allow cosmetic changes', 'Allow fixes for some languages',
-            'Timestamp minimum separation (SSA only) in ms');
+            'Timestamp minimum separation (SSA only) in ms',
+            'Allow timestamp manipulation', 'Fix collisions');
 
 $addons = array('Subtitle type',
             'Improved Subtitles Settings',
