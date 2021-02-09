@@ -13,7 +13,7 @@ if __name__ == '__main__':
     import argparse
 
     argparser = argparse.ArgumentParser(
-        description='Convert TTML/XML/DFXP subtitles to SubRip (SRT) or SSA/ASS format.')
+        description='Convert TTML/XML/DFXP/SRT/VTT subtitles to SubRip (SRT), SSA/ASS or WEBVTT (VTT) format.')
     argparser.add_argument('input-files',
         nargs="*",
         help='subtitle files',
@@ -73,15 +73,20 @@ if __name__ == '__main__':
         default=None, type=str,
         action='store')
     argparser.add_argument('--output-format',
-        dest='output_format', metavar="srt or ssa",
+        dest='output_format', metavar="srt, ssa or vtt",
         nargs='?',
         help='output format to use if an output file has not been set',
-        default='ssa', choices=['srt', 'ssa'],
+        default='ssa', choices=['srt', 'ssa', 'vtt'],
         action='store')
     argparser.add_argument('-srt', '--srt',
         dest='output_format',
         help='equivalent to --output_format srt',
         const='srt',
+        action='store_const')
+    argparser.add_argument('-vtt', '--vtt',
+        dest='output_format',
+        help='equivalent to --output_format vtt',
+        const='vtt',
         action='store_const')
     argparser.add_argument('--no-italics',
         dest='allow_italics',

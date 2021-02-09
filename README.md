@@ -1,5 +1,5 @@
 # ttml2ssa
-Convert TTML/XML/DFXP/VTT/SRT subtitles used by Netflix, HBO, Disney+, Prime Video and others to SRT or SSA/ASS format.
+Convert TTML/XML/DFXP/VTT/SRT subtitles used by Netflix, HBO, Disney+, Prime Video and others to SRT, SSA/ASS or VTT format.
 
 Note: `ttml2ssa` is *not* a full-featured TTML-to-SRT converter and only works on a small subset of TTML documents. Namely, documents that follow the formats seen on the aforementioned streaming services.
 
@@ -34,10 +34,11 @@ optional arguments:
                         in some specific languages
   -c [encoding], --charset [encoding]
                         the encoding of the input file
-  --output-format [srt or ssa]
+  --output-format [srt, ssa or vtt]
                         output format to use if an output file has not been
                         set
   -srt, --srt           equivalent to --output_format srt
+  -vtt, --vtt           equivalent to --output_format vtt
   --no-italics          removes the italic tags from the dialog texts
   --no-top              all dialog will be displayed at the bottom of the
                         screen

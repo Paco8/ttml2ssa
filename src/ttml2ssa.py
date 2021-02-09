@@ -10,6 +10,7 @@ from __future__ import unicode_literals, absolute_import, division
 import re
 import os.path
 from collections import OrderedDict
+from copy import deepcopy
 
 try:
     from defusedxml import minidom  # type: ignore
@@ -21,7 +22,7 @@ from timestampconverter import TimestampConverter
 
 class Ttml2Ssa(object):
 
-    VERSION = '0.1.19'
+    VERSION = '0.2.0'
 
     TIME_BASES = [
         'media',
@@ -393,6 +394,27 @@ class Ttml2Ssa(object):
             entry_count += 1
         return res
 
+    def generate_vtt(self):
+        """Return a string with the generated subtitle document in vtt format."""
+
+        vtt_format_str = '{} --> {} {}\n{}\n\n'
+        res = 'WEBVTT\n\n'
+
+        for entry in self.entries:
+            text = entry['text'].replace('\r', '')
+
+            if not self.allow_italics:
+                text = re.sub(r'<i>|</i>', '', text)
+
+            pos_str = 'line:90%,end'
+            if self.allow_top_pos and entry['position'] == 'top':
+                pos_str = 'line:10%,start'
+
+            res += vtt_format_str.format(self._tc.ms_to_subrip(entry['ms_begin']).replace(',','.'), \
+                                         self._tc.ms_to_subrip(entry['ms_end']).replace(',','.'), \
+                                         pos_str, text)
+        return res
+
     def _paragraphs_to_ssa(self, timestamp_min_sep=200):
         def fix_timestamps_separation(entries, timestamp_min_sep):
             for i in range(len(entries)):
@@ -403,7 +425,7 @@ class Ttml2Ssa(object):
                     entries[i]['ms_begin'] += s
                     entries[i-1]['ms_end'] -= s
 
-        entries = self.entries[:] # Copy list
+        entries = deepcopy(self.entries)
         if self.allow_timestamp_manipulation and timestamp_min_sep > 0:
             fix_timestamps_separation(entries, timestamp_min_sep)
 
@@ -523,18 +545,23 @@ class Ttml2Ssa(object):
     def write2file(self, output):
         """Write subtitle to file
 
-        It will be saved as ssa if the output filename
-        extension is ssa or ass. As srt otherwise.
+        It will be saved as ssa, srt or vtt according to the output file extension.
         """
 
         extension = os.path.splitext(output)[1].lower()
+        output_encoding = 'utf-8-sig'
+
+        if extension == '.ssa' or extension == '.ass':
+            res = self.generate_ssa()
+        elif extension == '.vtt':
+            res = self.generate_vtt()
+            output_encoding = 'utf-8'
+        else:
+            res = self.generate_srt()
 
         import io
-        with io.open(output, 'w', encoding='utf-8-sig') as handle:
-            if extension == '.ssa' or extension == '.ass':
-                handle.write(self.generate_ssa())
-            else:
-                handle.write(self.generate_srt())
+        with io.open(output, 'w', encoding=output_encoding) as handle:
+            handle.write(res)
 
     def _read_file(self, filename, encoding=None):
         """ Try to read the file using the supplied encoding (if any), utf-8 and latin-1 """
