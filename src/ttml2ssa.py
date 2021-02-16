@@ -22,7 +22,7 @@ from timestampconverter import TimestampConverter
 
 class Ttml2Ssa(object):
 
-    VERSION = '0.2.0'
+    VERSION = '0.2.1'
 
     TIME_BASES = [
         'media',
@@ -48,6 +48,7 @@ class Ttml2Ssa(object):
         self.ssa_timestamp_min_sep = 200
         self.use_cosmetic_filter = True
         self.use_language_filter = True
+        self.fix_amazon_errors = True
 
         self.allow_italics = True
         self.allow_top_pos = True
@@ -217,16 +218,16 @@ class Ttml2Ssa(object):
         if self.shift:
             self._shift_timestamps(self.shift)
 
+        # Sort and fix timestamps
+        self.entries = sorted(self.entries, key=lambda x: x['ms_begin'])
+        if self.allow_timestamp_manipulation and self.fix_timestamp_collisions:
+            self.entries = self._sequalize(self.entries)
+
         if self.use_cosmetic_filter:
             self._cosmetic_filter()
 
         if self.use_language_filter:
             self._language_fix_filter()
-
-        # Sort and fix timestamps
-        self.entries = sorted(self.entries, key=lambda x: x['ms_begin'])
-        if self.allow_timestamp_manipulation and self.fix_timestamp_collisions:
-            self.entries = self._sequalize(self.entries)
 
     def _get_tt_style_attrs(self, node, in_head=False):
         """Extract node's style attributes
@@ -484,8 +485,15 @@ class Ttml2Ssa(object):
     def _cosmetic_filter(self):
         total_count = 0
         for entry in self.entries:
+            number_of_lines = len(entry['text'].splitlines())
+
             entry['text'], n_changes = re.subn('—', '-', entry['text'])
             total_count += n_changes
+
+            # Sometimes, in amazon subtitles, the line break is missing when the 2nd line starts with '<i>-'
+            if self.fix_amazon_errors and number_of_lines == 1:
+                entry['text'], n_changes = re.subn(r'(\S)<i>-', r'\1\n<i>-', entry['text'])
+                total_count += n_changes
 
             # Add an space between '-' and the first word
             entry['text'], n_changes = re.subn(r'^(<i>|</i>|)-(\S)', r'\1- \2', entry['text'], flags=re.MULTILINE)
@@ -496,10 +504,16 @@ class Ttml2Ssa(object):
                 entry['text'] = '- ' + entry['text']
                 total_count += 1
 
+            # If there's only one line and it starts with '-', remove it
+            if number_of_lines == 1 and entry['text'].count('-') == 1 and \
+               (entry['text'].startswith('- ') or entry['text'].startswith('<i>- ')):
+                entry['text'] = entry['text'].replace('- ', '')
+                total_count += 1
+
         self._printinfo("Cosmetic changes: {}".format(total_count))
 
     def _language_fix_filter(self):
-        lang = self.subtitle_language if self.subtitle_language else self.lang
+        lang = self.subtitle_language or self.lang
         es_replacements = [('\xA8', '¿'), ('\xAD', '¡'), ('ń', 'ñ')]
         total_count = 0
         for entry in self.entries:
@@ -671,6 +685,7 @@ class Ttml2SsaAddon(Ttml2Ssa):
         self.ssa_style["MarginV"] = self.addon.getSettingInt('marginv')
         self.use_cosmetic_filter = self.addon.getSettingBool('cosmetic_filter')
         self.use_language_filter = self.addon.getSettingBool('language_filter')
+        self.fix_amazon_errors = self.addon.getSettingBool('fix_amazon')
         self.ssa_timestamp_min_sep = self.addon.getSettingInt('min_sep')
         self.allow_italics = self.addon.getSettingBool('allow_italics')
         self.allow_top_pos = self.addon.getSettingBool('allow_top_pos')
@@ -678,8 +693,9 @@ class Ttml2SsaAddon(Ttml2Ssa):
         self.fix_timestamp_collisions = self.addon.getSettingBool('fix_collisions')
         self._printinfo("Subtitle type: {}".format(self.subtitle_type()))
         self._printinfo("SSA style: {}".format(self.ssa_style))
-        self._printinfo("Cosmetic filter: {}".format("enabled" if self.use_cosmetic_filter else "disabled"))
-        self._printinfo("Language filter: {}".format("enabled" if self.use_language_filter else "disabled"))
+        self._printinfo("Cosmetic filter: {}".format("yes" if self.use_cosmetic_filter else "no"))
+        self._printinfo("Language filter: {}".format("yes" if self.use_language_filter else "no"))
+        self._printinfo("Fix Amazon errors: {}".format("yes" if self.fix_amazon_errors else "no"))
         self._printinfo("Timestamp minimum separation: {}".format(self.ssa_timestamp_min_sep))
 
     def subtitle_type(self):
@@ -687,7 +703,7 @@ class Ttml2SsaAddon(Ttml2Ssa):
         Posible values: srt, ssa, both
         """
 
-        return ['srt', 'ssa', 'both'][self.addon.getSettingInt('subtitle_type')]
+        return Ttml2SsaAddon.subtitle_type()
 
     @staticmethod
     def _addon():

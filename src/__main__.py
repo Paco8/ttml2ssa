@@ -66,6 +66,10 @@ if __name__ == '__main__':
         dest="language_fix",
         help="disables a filter which can fix some wrong characters in some specific languages",
         action='store_false')
+    argparser.add_argument('--no-fix-amazon-errors',
+        dest="fix_amazon",
+        help="don't try to fix errors that may occur in subtitles from Amazon",
+        action='store_false')
     argparser.add_argument('-c', '--charset',
         dest='encoding', metavar='encoding',
         help='the encoding of the input file',
@@ -160,6 +164,7 @@ if __name__ == '__main__':
     #ttml.source_fps = args.sfps
     ttml.use_cosmetic_filter = args.cosmetic_fix
     ttml.use_language_filter = args.language_fix
+    ttml.fix_amazon_errors = args.fix_amazon
     ttml.allow_italics = args.allow_italics
     ttml.allow_top_pos = args.allow_top_pos
     ttml.allow_timestamp_manipulation = args.timestamp_manipulation

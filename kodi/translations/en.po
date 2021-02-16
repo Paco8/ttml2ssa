@@ -117,6 +117,10 @@ msgctxt "#32107"
 msgid "Fix collisions"
 msgstr ""
 
+msgctxt "#32108"
+msgid "Try to fix Amazon errors"
+msgstr ""
+
 msgctxt "#32200"
 msgid "Subtitle type"
 msgstr ""

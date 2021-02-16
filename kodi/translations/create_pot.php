@@ -42,7 +42,8 @@ $misc = array('Misc',
             'Allow italics', 'Allow text on the top',
             'Allow cosmetic changes', 'Allow fixes for some languages',
             'Timestamp minimum separation (SSA only) in ms',
-            'Allow timestamp manipulation', 'Fix collisions');
+            'Allow timestamp manipulation', 'Fix collisions',
+            'Try to fix Amazon errors');
 
 $addons = array('Subtitle type',
             'Improved Subtitles Settings',

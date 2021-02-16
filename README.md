@@ -32,6 +32,9 @@ optional arguments:
                         word
   --no-language-fix     disables a filter which can fix some wrong characters
                         in some specific languages
+  --no-fix-amazon-errors
+                        don't try to fix errors that may occur in subtitles
+                        from Amazon
   -c [encoding], --charset [encoding]
                         the encoding of the input file
   --output-format [srt, ssa or vtt]
