@@ -8,9 +8,12 @@
 from __future__ import unicode_literals, absolute_import, division
 
 import re
+import io
 import os.path
+import json
 from collections import OrderedDict
 from copy import deepcopy
+import tempfile
 
 try:
     from defusedxml import minidom  # type: ignore
@@ -22,7 +25,7 @@ from timestampconverter import TimestampConverter
 
 class Ttml2Ssa(object):
 
-    VERSION = '0.2.1'
+    VERSION = '0.2.6'
 
     TIME_BASES = [
         'media',
@@ -55,6 +58,13 @@ class Ttml2Ssa(object):
 
         self.allow_timestamp_manipulation = True
         self.fix_timestamp_collisions = True
+
+        try:
+            self.cache_directory = tempfile.gettempdir() # Fails on Android
+            self.cache_downloaded_subtitles = True
+        except:
+            self.cache_directory = None
+            self.cache_downloaded_subtitles = False
 
         self._styles = {}
         self._italic_style_ids = []
@@ -573,14 +583,11 @@ class Ttml2Ssa(object):
         else:
             res = self.generate_srt()
 
-        import io
         with io.open(output, 'w', encoding=output_encoding) as handle:
             handle.write(res)
 
     def _read_file(self, filename, encoding=None):
         """ Try to read the file using the supplied encoding (if any), utf-8 and latin-1 """
-
-        import io
 
         contents = ""
 
@@ -626,32 +633,6 @@ class Ttml2Ssa(object):
         return hex_number
 
     @staticmethod
-    def mfn2subfn(media_filename, lang=None, m_ext=True, format='srt'):
-        """Create subtitle filename from media filename
-        """
-
-        extension = 'ssa' if format == 'ssa' else 'srt'
-
-        if not m_ext:
-            return '{}{}.{}'.format(
-                media_filename,
-                '.{}'.format(lang) if lang else '', extension)
-        else:
-            return '{}{}.{}'.format(
-                '.'.join(media_filename.split('.')[:-1]),
-                '.{}'.format(lang) if lang else '', extension)
-
-    @staticmethod
-    def mfn2srtfn(media_filename, lang=None, m_ext=True):
-        """Create SRT filename from media filename
-
-        Uses the <media file w/o ext>.<lang>.srt form recognized by Plex,
-        Kodi, VLC, MPV, and others.
-        """
-
-        return Ttml2Ssa.mfn2subfn(media_filename, lang, m_ext, 'srt')
-
-    @staticmethod
     def snake_to_camel(s):
         camel = ''
         for c in s:
@@ -662,12 +643,167 @@ class Ttml2Ssa(object):
                 camel += c
         return camel
 
+    @staticmethod
+    def parse_m3u8_from_string(m3u8):
+        segments = []
+
+        lines = m3u8.splitlines()
+        duration = 0
+        discontinuity = False
+        for line in lines:
+            m = re.match(r'#EXTINF:([0-9.]+),', line)
+            if m:
+                duration = float(m.group(1))
+            if line.startswith('#EXT-X-DISCONTINUITY'):
+                discontinuity = True
+            if not line.startswith('#'):
+                segment = {}
+                segment['url'] = line
+                segment['duration'] = duration
+                segment['discontinuity'] = discontinuity
+                segments.append(segment)
+                duration = 0
+                discontinuity = False
+
+        return segments
+
+    def download_m3u8_subtitle(self, url):
+        """ Download all segments from a m3u8 file and joins them together.
+        Return a string with the subtitle and a list of the segments.
+        """
+
+        import requests
+
+        baseurl = os.path.dirname(url)
+        self._printinfo('Downloading {}'.format(url))
+        #self._printinfo('baseurl: {}'.format(baseurl))
+        r = requests.get(url, allow_redirects=True)
+        segments = Ttml2Ssa.parse_m3u8_from_string(r.content.decode('utf-8'))
+        #self._printinfo('segments: {}'.format(json.dumps(segments, sort_keys=True, indent=4)))
+        self._printinfo('segments: {}'.format(json.dumps(segments)))
+
+        res = ''
+        for segment in segments:
+            url = baseurl +'/'+ segment['url']
+            self._printinfo('Downloading segment: {}'.format(os.path.basename(url)))
+            r = requests.get(url, allow_redirects=True)
+            res += r.content.decode('utf-8')
+
+        return res, segments
+
+    def download_m3u8_disney(self, url):
+        if self.cache_downloaded_subtitles and self.cache_directory:
+            vtt, offset = self._load_vtt_from_cache(url)
+            if vtt:
+                return vtt, offset
+
+        vtt, segments = self.download_m3u8_subtitle(url)
+        offset = 0
+        if len(segments) > 1 and segments[1]['discontinuity']:
+            offset = segments[0]['duration'] * 1000
+        self._printinfo("offset: {}".format(offset))
+
+        if self.cache_downloaded_subtitles and self.cache_directory:
+            self._save_vtt_to_cache(url, vtt, offset)
+
+        return vtt, offset
+
+    def _cache_filename(self, url):
+        import hashlib
+        id = re.sub(r'(?:https|http)://.*?/', '', url)
+        self._printinfo('cache id: {}'.format(id))
+        md5sum = hashlib.md5(id.encode('utf-8')).hexdigest()
+        return '{}{}{}.json'.format(self.cache_directory, os.path.sep, md5sum)
+
+    def _save_vtt_to_cache(self, url, vtt, offset):
+        filename = self._cache_filename(url)
+        self._printinfo('Saving {}'.format(filename))
+        
+        data = {}
+        data['data'] = vtt
+        data['offset'] = offset
+
+        with io.open(filename, 'w', encoding='utf-8') as handle:
+            handle.write(json.dumps(data, ensure_ascii=False))
+
+    def _load_vtt_from_cache(self, url):
+        filename = self._cache_filename(url)
+        if os.path.exists(filename):
+            self._printinfo('Loading {}'.format(filename))
+            with io.open(filename, 'r', encoding='utf-8') as handle:
+                data = json.loads(handle.read())
+                return data['data'], data['offset']
+        return '', 0
+
+    @staticmethod
+    def get_subtitle_list_from_m3u8_string(doc, language_list=None, allow_forced=True, allow_non_forced=True, baseurl=''):
+        def lang_allowed(lang, lang_list):
+            if not lang_list:
+                return True
+
+            lang = lang.lower()
+
+            for l in lang_list:
+                if lang.startswith(l.lower()):
+                    return True
+
+            return False
+
+        sub_list = []
+        lines = doc.splitlines()
+        tag = '#EXT-X-MEDIA:TYPE=SUBTITLES,'
+        for line in lines:
+            if line.startswith(tag):
+                sub = {}
+                sub['lang'] = ''
+                sub['name'] = ''
+                sub['forced'] = False
+                sub['url'] = ''
+                line = line.replace(tag, '')
+                params = line.split(',')
+
+                for param in params:
+                    if '=' in param:
+                        name, value = param.split('=', 1)
+                        value = value.replace('"', '')
+                        if name == 'LANGUAGE': sub['lang'] = value
+                        elif name == 'NAME': sub['name'] = value
+                        elif name == 'FORCED' and value == 'YES': sub['forced'] = True
+                        elif name == 'URI': sub['url'] = baseurl + value
+
+                if sub['url'] and sub['name'] and sub['lang']:
+                    sub['impaired'] = 'CC' in sub['name']
+                    sub['filename'] = '{}{}{}'.format(sub['lang'], '.[CC]' if sub['impaired'] else '', '.forced' if sub['forced']  else '')
+                    if lang_allowed(sub['lang'], language_list) and ((allow_forced and sub['forced']) or (allow_non_forced and not sub['forced'])):
+                        sub_list.append(sub)
+
+        return sub_list
+
+    def get_subtitle_list_from_m3u8_url(self, url, language_list=None, allow_forced=True, allow_non_forced=True):
+        import requests
+        self._printinfo('Downloading {}'.format(url))
+        baseurl = os.path.dirname(url) + '/'
+        r = requests.get(url, allow_redirects=True)
+        sub_list = Ttml2Ssa.get_subtitle_list_from_m3u8_string(r.content.decode('utf-8'), language_list, allow_forced, allow_non_forced, baseurl)
+        return sub_list
+
 
 class Ttml2SsaAddon(Ttml2Ssa):
     def __init__(self, shift=0, source_fps=23.976, scale_factor=1, subtitle_language=None):
         super(Ttml2SsaAddon, self).__init__(shift, source_fps, scale_factor, subtitle_language)
         self.addon = Ttml2SsaAddon._addon()
         self._load_settings()
+        
+        try:  # Kodi >= 19
+            from xbmcvfs import translatePath
+        except ImportError:  # Kodi 18
+            from xbmc import translatePath
+
+        self.cache_directory = translatePath(self.addon.getAddonInfo('profile')) + "subtitles" + os.sep
+        self._printinfo("Cache directory: {}".format(self.cache_directory))
+        if not os.path.exists(os.path.dirname(self.cache_directory)):
+            os.makedirs(os.path.dirname(self.cache_directory))
+        self.cache_downloaded_subtitles = True
 
     def _load_settings(self):
         self.ssa_style["Fontname"] = self.addon.getSetting('fontname')
