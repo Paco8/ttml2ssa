@@ -25,7 +25,7 @@ from timestampconverter import TimestampConverter
 
 class Ttml2Ssa(object):
 
-    VERSION = '0.2.6'
+    VERSION = '0.2.8'
 
     TIME_BASES = [
         'media',
@@ -736,7 +736,7 @@ class Ttml2Ssa(object):
         return '', 0
 
     @staticmethod
-    def get_subtitle_list_from_m3u8_string(doc, language_list=None, allow_forced=True, allow_non_forced=True, baseurl=''):
+    def get_subtitle_list_from_m3u8_string(doc, language_list=None, allow_forced=True, allow_non_forced=True, baseurl='', sort=True):
         def lang_allowed(lang, lang_list):
             if not lang_list:
                 return True
@@ -776,6 +776,9 @@ class Ttml2Ssa(object):
                     sub['filename'] = '{}{}{}'.format(sub['lang'], '.[CC]' if sub['impaired'] else '', '.forced' if sub['forced']  else '')
                     if lang_allowed(sub['lang'], language_list) and ((allow_forced and sub['forced']) or (allow_non_forced and not sub['forced'])):
                         sub_list.append(sub)
+
+        if sort:
+            sub_list = sorted(sub_list, key=lambda x: x['lang'].replace('-419', '-lat') +" "+ str(int(x['forced'])))
 
         return sub_list
 
@@ -853,7 +856,7 @@ class Ttml2SsaAddon(Ttml2Ssa):
         """
 
         addon = Ttml2SsaAddon._addon()
-        return ['srt', 'ssa', 'both'][addon.getSettingInt('subtitle_type')]
+        return ['ssa', 'srt', 'both'][addon.getSettingInt('subtitle_type')]
 
     def _printinfo(self, text):
         """ Print info in the kodi log """

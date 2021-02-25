@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <settings>
     <category label="32016">
-        <setting label="32200" type="enum" id="subtitle_type" lvalues="32203|32204|32205"/>
+        <setting label="32200" type="enum" id="subtitle_type" lvalues="32204|32203|32205"/>
         <setting label="32000" type="lsep"/>
         <setting label="32001" type="text" id="fontname" default="Arial"/>
         <setting label="32002" type="number" id="fontsize" default="50"/>
