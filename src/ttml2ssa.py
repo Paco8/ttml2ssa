@@ -25,7 +25,7 @@ from timestampconverter import TimestampConverter
 
 class Ttml2Ssa(object):
 
-    VERSION = '0.2.10'
+    VERSION = '0.2.11'
 
     TIME_BASES = [
         'media',
@@ -156,7 +156,7 @@ class Ttml2Ssa(object):
         ):
             ttp_val = getattr(
                 tt_element.attributes.get('ttp:' + ttp_name), 'value', defval)
-            opttime[Ttml2Ssa.snake_to_camel(ttp_name)] = convfn(ttp_val)
+            opttime[Ttml2Ssa._snake_to_camel(ttp_name)] = convfn(ttp_val)
 
         if opttime['time_base'] not in Ttml2Ssa.TIME_BASES:
             raise NotImplementedError('No support for "{}" time base'.format(
@@ -251,7 +251,7 @@ class Ttml2Ssa(object):
         style = {}
         for attr_name in self._allowed_style_attrs:
             tts = 'tts:' + attr_name
-            attr_name = Ttml2Ssa.snake_to_camel(attr_name)
+            attr_name = Ttml2Ssa._snake_to_camel(attr_name)
             style[attr_name] = node.getAttribute(tts) or ''
         if not in_head:
             style['style_id'] = node.getAttribute('style')
@@ -633,7 +633,7 @@ class Ttml2Ssa(object):
         return hex_number
 
     @staticmethod
-    def snake_to_camel(s):
+    def _snake_to_camel(s):
         camel = ''
         for c in s:
             d = ord(c)
@@ -645,6 +645,8 @@ class Ttml2Ssa(object):
 
     @staticmethod
     def parse_m3u8_from_string(m3u8):
+        """ Parse a m3u8 from a string a return a list of the segments """
+
         segments = []
 
         lines = m3u8.splitlines()
@@ -692,6 +694,12 @@ class Ttml2Ssa(object):
         return res, segments
 
     def download_m3u8_disney(self, url):
+        """ Similar to download_m3u8_subtitle but specific for Disney+
+        Download all segments from a m3u8 file and joins them together.
+        Return a string with the subtitle and the offset (in milliseconds)
+        that must be added to the timestamps.
+        """
+
         if self.cache_downloaded_subtitles and self.cache_directory:
             vtt, offset = self._load_vtt_from_cache(url)
             if vtt:
@@ -737,6 +745,8 @@ class Ttml2Ssa(object):
 
     @staticmethod
     def get_subtitle_list_from_m3u8_string(doc, language_list=None, allow_forced=True, allow_non_forced=True, baseurl='', sort=True):
+        """ Parse a m3u8 file, look for subtitles and return a list of them """
+
         def lang_allowed(lang, lang_list):
             if not lang_list:
                 return True
@@ -783,6 +793,8 @@ class Ttml2Ssa(object):
         return sub_list
 
     def get_subtitle_list_from_m3u8_url(self, url, language_list=None, allow_forced=True, allow_non_forced=True):
+        """ Download the m3u8 file from the url, look for subtitles in the file and return a list of them """
+
         import requests
         self._printinfo('Downloading {}'.format(url))
         baseurl = os.path.dirname(url) + '/'

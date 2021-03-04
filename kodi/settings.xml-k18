@@ -11,7 +11,7 @@
         <setting label="32006" type="enum" id="borderstyle" lvalues="32007|32008"/>
         <setting label="32009" type="number" id="outline" default="2"/>
         <setting label="32010" type="number" id="shadow" default="3"/>
-        <setting label="32011" type="bool" id="bold" default="false"/>
+        <setting label="32011" type="bool" id="bold" default="true"/>
         <setting label="32012" type="bool" id="italic" default="false"/>
         <setting label="32013" type="number" id="marginv" default="40"/>
         <setting label="32014" type="number" id="marginl" default="40"/>

@@ -21,6 +21,7 @@
 		<source>https://github.com/Paco8/ttml2ssa</source>
 		<assets>
 			<icon>icon.png</icon>
+			<fanart>resources/fanart.jpg</fanart>
 			<screenshot>resources/screen1.jpg</screenshot>
 			<screenshot>resources/screen2.jpg</screenshot>
 		</assets>
