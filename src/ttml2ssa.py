@@ -25,7 +25,7 @@ from timestampconverter import TimestampConverter
 
 class Ttml2Ssa(object):
 
-    VERSION = '0.2.11'
+    VERSION = '0.3.0'
 
     TIME_BASES = [
         'media',
@@ -612,13 +612,22 @@ class Ttml2Ssa(object):
         color_names = {
             # In BBGGRR
             'WHITE': 'FFFFFF',
+            'BLANCO': 'FFFFFF',
             'GRAY': '808080',
+            'GREY': '808080',
+            'GRIS': '808080',
             'YELLOW': '00FFFF',
+            'AMARILLO': '00FFFF',
             'RED': '0000FF',
+            'ROJO': '0000FF',
             'GREEN': '00FF00',
+            'VERDE': '00FF00',
             'BLUE': 'FF0000',
+            'AZUL': 'FF0000',
             'BROWN': '2A2AA5',
-            'BLACK': '000000'
+            'MARRON': '2A2AA5',
+            'BLACK': '000000',
+            'NEGRO': '000000'
         }
         if text in color_names:
             text = color_names[text]

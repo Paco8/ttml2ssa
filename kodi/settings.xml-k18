@@ -5,9 +5,9 @@
         <setting label="32000" type="lsep"/>
         <setting label="32001" type="text" id="fontname" default="Arial"/>
         <setting label="32002" type="number" id="fontsize" default="50"/>
-        <setting label="32003" type="text" id="primarycolor" default="00EEEEEE"/>
+        <setting label="32003" type="text" id="primarycolor" default="white"/>
         <setting label="32004" type="text" id="backcolor" default="40000000"/>
-        <setting label="32005" type="text" id="outlinecolor" default="00000000"/>
+        <setting label="32005" type="text" id="outlinecolor" default="black"/>
         <setting label="32006" type="enum" id="borderstyle" lvalues="32007|32008"/>
         <setting label="32009" type="number" id="outline" default="2"/>
         <setting label="32010" type="number" id="shadow" default="3"/>

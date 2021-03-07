@@ -16,7 +16,7 @@
 		<summary lang="en_GB">Ttml2Ssa Library.</summary>
 		<description lang="en_GB">Ttml2Ssa is a library that allows other addons to convert TTML/XML/DFXP/VTT/SRT subtitles to SRT and SSA/ASS formats. It also provides a configuration window where the user can adjust the SSA/ASS style and other options.</description>
 		<platform>all</platform>
-		<license>GPL-2.0-or-later</license>
+		<license>LGPL-2.1-or-later</license>
 		<website>https://github.com/Paco8/ttml2ssa</website>
 		<source>https://github.com/Paco8/ttml2ssa</source>
 		<assets>
