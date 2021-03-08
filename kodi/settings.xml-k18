@@ -23,6 +23,7 @@
         <setting label="32103" type="bool" id="cosmetic_filter" default="true"/>
         <setting label="32108" type="bool" id="fix_amazon" default="true" enable="eq(-1,true)"/>
         <setting label="32104" type="bool" id="language_filter" default="true"/>
+        <setting label="32109" type="bool" id="cache_downloaded" default="true"/>
         <setting label="32106" type="bool" id="timestamp manipulation" default="true"/>
         <setting label="32107" type="bool" id="fix_collisions" default="true" enable="eq(-1,true)"/>
         <setting label="32105" type="number" id="min_sep" default="200" enable="eq(-2,true)"/>

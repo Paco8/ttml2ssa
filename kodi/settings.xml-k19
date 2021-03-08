@@ -143,6 +143,11 @@
                     <default>true</default>
                     <control type="toggle"/>
                 </setting>
+                <setting id="cache_downloaded" type="boolean" label="32109" help="">
+                    <level>2</level>
+                    <default>true</default>
+                    <control type="toggle"/>
+                </setting>
                 <setting id="timestamp manipulation" type="boolean" label="32106" help="">
                     <level>3</level>
                     <default>true</default>

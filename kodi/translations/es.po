@@ -30,16 +30,16 @@ msgid "Font size"
 msgstr "Tamaño de la fuente"
 
 msgctxt "#32003"
-msgid "Primary colour (AABBGGRR)"
-msgstr "Color principal (AABBGGRR)"
+msgid "Primary colour (AABBGGRR or colour name)"
+msgstr "Color principal (AABBGGRR o nombre de color)"
 
 msgctxt "#32004"
-msgid "Back colour (AABBGGRR)"
-msgstr "Color de fondo (AABBGGRR)"
+msgid "Back colour (AABBGGRR or colour name)"
+msgstr "Color de fondo (AABBGGRR o nombre de color)"
 
 msgctxt "#32005"
-msgid "Outline colour (AABBGGRR)"
-msgstr "Color del contorno (AABBGGRR)"
+msgid "Outline colour (AABBGGRR or colour name)"
+msgstr "Color del contorno (AABBGGRR o nombre de color)"
 
 msgctxt "#32006"
 msgid "Border style"
@@ -121,6 +121,10 @@ msgctxt "#32108"
 msgid "Try to fix Amazon errors"
 msgstr "Intentar arreglar errores de Amazon"
 
+msgctxt "#32109"
+msgid "Cache downloaded subtitles"
+msgstr "Guardar subtítulos descargados en cache"
+
 msgctxt "#32200"
 msgid "Subtitle type"
 msgstr "Tipo de subtítulo"
@@ -144,6 +148,18 @@ msgstr "Mejorado (SSA)"
 msgctxt "#32205"
 msgid "Both"
 msgstr "Ambos"
+
+#~ msgctxt "#32003"
+#~ msgid "Primary colour (AABBGGRR)"
+#~ msgstr "Color principal (AABBGGRR)"
+
+#~ msgctxt "#32004"
+#~ msgid "Back colour (AABBGGRR)"
+#~ msgstr "Color de fondo (AABBGGRR)"
+
+#~ msgctxt "#32005"
+#~ msgid "Outline colour (AABBGGRR)"
+#~ msgstr "Color del contorno (AABBGGRR)"
 
 #~ msgctxt "#32201"
 #~ msgid "SSA Settings"

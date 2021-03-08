@@ -25,7 +25,7 @@ from timestampconverter import TimestampConverter
 
 class Ttml2Ssa(object):
 
-    VERSION = '0.3.0'
+    VERSION = '0.3.1'
 
     TIME_BASES = [
         'media',
@@ -356,6 +356,14 @@ class Ttml2Ssa(object):
         The result is stored in the `entries` list, as begin (ms), end (ms), text, position.
         """
 
+        try:
+            # Python 2
+            from HTMLParser import HTMLParser
+        except ImportError:
+            # Python 3
+            from html.parser import HTMLParser
+        htmlparser = HTMLParser()
+
         del self.entries [:]
         self._tc = TimestampConverter()
 
@@ -379,7 +387,7 @@ class Ttml2Ssa(object):
                         text += line
                     else:
                         break
-                entry['text'] = text
+                entry['text'] = htmlparser.unescape(text)
                 self.entries.append(entry)
         self._apply_options()
 
@@ -816,7 +824,6 @@ class Ttml2SsaAddon(Ttml2Ssa):
     def __init__(self, shift=0, source_fps=23.976, scale_factor=1, subtitle_language=None):
         super(Ttml2SsaAddon, self).__init__(shift, source_fps, scale_factor, subtitle_language)
         self.addon = Ttml2SsaAddon._addon()
-        self._load_settings()
         
         try:  # Kodi >= 19
             from xbmcvfs import translatePath
@@ -828,6 +835,8 @@ class Ttml2SsaAddon(Ttml2Ssa):
         if not os.path.exists(os.path.dirname(self.cache_directory)):
             os.makedirs(os.path.dirname(self.cache_directory))
         self.cache_downloaded_subtitles = True
+
+        self._load_settings()
 
     def _load_settings(self):
         self.ssa_style["Fontname"] = self.addon.getSetting('fontname')
@@ -846,6 +855,7 @@ class Ttml2SsaAddon(Ttml2Ssa):
         self.use_cosmetic_filter = self.addon.getSettingBool('cosmetic_filter')
         self.use_language_filter = self.addon.getSettingBool('language_filter')
         self.fix_amazon_errors = self.addon.getSettingBool('fix_amazon')
+        self.cache_downloaded_subtitles = self.addon.getSettingBool('cache_downloaded')
         self.ssa_timestamp_min_sep = self.addon.getSettingInt('min_sep')
         self.allow_italics = self.addon.getSettingBool('allow_italics')
         self.allow_top_pos = self.addon.getSettingBool('allow_top_pos')
@@ -856,6 +866,7 @@ class Ttml2SsaAddon(Ttml2Ssa):
         self._printinfo("Cosmetic filter: {}".format("yes" if self.use_cosmetic_filter else "no"))
         self._printinfo("Language filter: {}".format("yes" if self.use_language_filter else "no"))
         self._printinfo("Fix Amazon errors: {}".format("yes" if self.fix_amazon_errors else "no"))
+        self._printinfo("Cache downloaded subtitles: {}".format("yes" if self.cache_downloaded_subtitles else "no"))
         self._printinfo("Timestamp minimum separation: {}".format(self.ssa_timestamp_min_sep))
 
     def subtitle_type(self):

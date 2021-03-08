@@ -30,7 +30,9 @@ function print_section($l, $n) {
 
 $style =  array('SSA Style', 
             'Font name', 'Font size', 
-            'Primary colour (AABBGGRR)', 'Back colour (AABBGGRR)', 'Outline colour (AABBGGRR)',
+            'Primary colour (AABBGGRR or colour name)',
+            'Back colour (AABBGGRR or colour name)',
+            'Outline colour (AABBGGRR or colour name)',
             'Border style',
             'Outline with shadow', 'Opaque box',
             'Outline', 'Shadow',
@@ -43,7 +45,8 @@ $misc = array('Misc',
             'Allow cosmetic changes', 'Allow fixes for some languages',
             'Timestamp minimum separation (SSA only) in ms',
             'Allow timestamp manipulation', 'Fix collisions',
-            'Try to fix Amazon errors');
+            'Try to fix Amazon errors',
+            'Cache downloaded subtitles');
 
 $addons = array('Subtitle type',
             'Improved Subtitles Settings',

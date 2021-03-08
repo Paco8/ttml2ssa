@@ -97,24 +97,24 @@ ttml2ssa --scale-factor 23.976/25 subtitle_from_netflix.xml -o subtitle.srt
 ```
 or
 ```
-ttml2ssa.py --scale-factor NTSC2PAL subtitle_from_netflix.xml -o subtitle.srt
+ttml2ssa --scale-factor NTSC2PAL subtitle_from_netflix.xml -o subtitle.srt
 ```
 Those examples will convert a subtitle made for a movie at 23.976 frames per second for a version sped up to 25 fps (very common in Europe).
 
 Convert two subtitles:
 ```
-ttml2ssa.py subtitle1.xml subtitle2.xml
+ttml2ssa subtitle1.xml subtitle2.xml
 ```
 That will convert the subtitles to subtitle1.ssa and subtitle2.ssa
 
 Convert all subtitles in a folder:
 ```
-ttml2ssa.py *.xml
+ttml2ssa *.xml
 ```
 All files with extersion xml will be converted to ssa.
 
 ### Library
-ttml2ssa.py can also be used as a library for other applications.
+ttml2ssa can also be used as a library for other applications.
 
 Simple example:
 ```
@@ -170,5 +170,5 @@ To open the ttml2ssa configuration dialog, you can add this to your addon settin
 ```
 
 ### Authors
-ttml2ssa.py by Paco8, based on [ttml2srt](https://github.com/yuppity/ttml2srt) by yuppity.
+ttml2ssa by Paco8, based on [ttml2srt](https://github.com/yuppity/ttml2srt) by yuppity.
 License: LGPL-2.1

@@ -30,15 +30,15 @@ msgid "Font size"
 msgstr ""
 
 msgctxt "#32003"
-msgid "Primary colour (AABBGGRR)"
+msgid "Primary colour (AABBGGRR or colour name)"
 msgstr ""
 
 msgctxt "#32004"
-msgid "Back colour (AABBGGRR)"
+msgid "Back colour (AABBGGRR or colour name)"
 msgstr ""
 
 msgctxt "#32005"
-msgid "Outline colour (AABBGGRR)"
+msgid "Outline colour (AABBGGRR or colour name)"
 msgstr ""
 
 msgctxt "#32006"
@@ -119,6 +119,10 @@ msgstr ""
 
 msgctxt "#32108"
 msgid "Try to fix Amazon errors"
+msgstr ""
+
+msgctxt "#32109"
+msgid "Cache downloaded subtitles"
 msgstr ""
 
 msgctxt "#32200"
