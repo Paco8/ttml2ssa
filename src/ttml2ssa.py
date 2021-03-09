@@ -3,7 +3,7 @@
 #  --------------------------------------------
 #  based on https://github.com/yuppity/ttml2srt
 #  --------------------------------------------
-# SPDX-License-Identifier: GPL-2.0-or-later
+# SPDX-License-Identifier: LGPL-2.1-or-later
 
 from __future__ import unicode_literals, absolute_import, division
 
@@ -25,7 +25,7 @@ from timestampconverter import TimestampConverter
 
 class Ttml2Ssa(object):
 
-    VERSION = '0.3.1'
+    VERSION = '0.3.2'
 
     TIME_BASES = [
         'media',
@@ -356,13 +356,21 @@ class Ttml2Ssa(object):
         The result is stored in the `entries` list, as begin (ms), end (ms), text, position.
         """
 
-        try:
-            # Python 2
-            from HTMLParser import HTMLParser
-        except ImportError:
-            # Python 3
-            from html.parser import HTMLParser
-        htmlparser = HTMLParser()
+        def unescape_text(text):
+            try:
+                # Python 2
+                from HTMLParser import HTMLParser
+            except ImportError:
+                # Python 3
+                from html.parser import HTMLParser
+            htmlparser = HTMLParser()
+            no_escape_list = [('&lrm;', '<lrm>'), ('&rlm;', '<rlm>')]
+            for c in no_escape_list:
+                text = text.replace(c[0], c[1])
+            text = htmlparser.unescape(text)
+            for c in no_escape_list:
+                text = text.replace(c[1], c[0])
+            return text
 
         del self.entries [:]
         self._tc = TimestampConverter()
@@ -387,7 +395,7 @@ class Ttml2Ssa(object):
                         text += line
                     else:
                         break
-                entry['text'] = htmlparser.unescape(text)
+                entry['text'] = unescape_text(text)
                 self.entries.append(entry)
         self._apply_options()
 
@@ -541,12 +549,19 @@ class Ttml2Ssa(object):
                     entry['text'] = entry['text'].replace(rep[0], rep[1])
             if lang == 'ar':
                 from unicodedata import lookup
-                entry['text'], n_changes = re.subn(r'^(?!{}|{})'.format(lookup('RIGHT-TO-LEFT MARK'), lookup('RIGHT-TO-LEFT EMBEDDING')),
-                                              lookup('RIGHT-TO-LEFT EMBEDDING'), entry['text'], flags=re.MULTILINE)
-                total_count += n_changes
-                total_count += entry['text'].count('?')
-                total_count += entry['text'].count(',')
-                entry['text'] = entry['text'].replace('?', '؟').replace(',', '،')
+                # Netflix (vtt)
+                if '&lrm;' in entry['text'] or '&rlm;' in entry['text']:
+                    total_count += entry['text'].count('&lrm;')
+                    entry['text'] = entry['text'].replace('&lrm;', lookup('LEFT-TO-RIGHT EMBEDDING'))
+                    total_count += entry['text'].count('&rlm;')
+                    entry['text'] = entry['text'].replace('&rlm;', lookup('RIGHT-TO-LEFT EMBEDDING'))
+                else:
+                    # Amazon
+                    entry['text'], n_changes = re.subn(r'^(?!{}|{})'.format(lookup('RIGHT-TO-LEFT MARK'), lookup('RIGHT-TO-LEFT EMBEDDING')), lookup('RIGHT-TO-LEFT EMBEDDING'), entry['text'], flags=re.MULTILINE)
+                    total_count += n_changes
+                    total_count += entry['text'].count('?')
+                    total_count += entry['text'].count(',')
+                    entry['text'] = entry['text'].replace('?', '؟').replace(',', '،')
         self._printinfo("Replacements for language '{}': {}".format(lang, total_count))
 
     def _sequalize(self, entries):

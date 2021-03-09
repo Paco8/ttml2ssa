@@ -3,7 +3,7 @@
 #  --------------------------------------------
 #  based on https://github.com/yuppity/ttml2srt
 #  --------------------------------------------
-# SPDX-License-Identifier: GPL-2.0-or-later
+# SPDX-License-Identifier: LGPL-2.1-or-later
 
 from __future__ import unicode_literals, absolute_import, division
 import re
