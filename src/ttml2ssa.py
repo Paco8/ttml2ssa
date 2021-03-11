@@ -25,7 +25,7 @@ from timestampconverter import TimestampConverter
 
 class Ttml2Ssa(object):
 
-    VERSION = '0.3.2'
+    VERSION = '0.3.3'
 
     TIME_BASES = [
         'media',
@@ -363,13 +363,11 @@ class Ttml2Ssa(object):
             except ImportError:
                 # Python 3
                 from html.parser import HTMLParser
+            from unicodedata import lookup
             htmlparser = HTMLParser()
-            no_escape_list = [('&lrm;', '<lrm>'), ('&rlm;', '<rlm>')]
-            for c in no_escape_list:
-                text = text.replace(c[0], c[1])
+            text = text.replace('&lrm;', lookup('LEFT-TO-RIGHT EMBEDDING'))
+            text = text.replace('&rlm;', lookup('RIGHT-TO-LEFT EMBEDDING'))
             text = htmlparser.unescape(text)
-            for c in no_escape_list:
-                text = text.replace(c[1], c[0])
             return text
 
         del self.entries [:]
@@ -549,15 +547,9 @@ class Ttml2Ssa(object):
                     entry['text'] = entry['text'].replace(rep[0], rep[1])
             if lang == 'ar':
                 from unicodedata import lookup
-                # Netflix (vtt)
-                if '&lrm;' in entry['text'] or '&rlm;' in entry['text']:
-                    total_count += entry['text'].count('&lrm;')
-                    entry['text'] = entry['text'].replace('&lrm;', lookup('LEFT-TO-RIGHT EMBEDDING'))
-                    total_count += entry['text'].count('&rlm;')
-                    entry['text'] = entry['text'].replace('&rlm;', lookup('RIGHT-TO-LEFT EMBEDDING'))
-                else:
-                    # Amazon
-                    entry['text'], n_changes = re.subn(r'^(?!{}|{})'.format(lookup('RIGHT-TO-LEFT MARK'), lookup('RIGHT-TO-LEFT EMBEDDING')), lookup('RIGHT-TO-LEFT EMBEDDING'), entry['text'], flags=re.MULTILINE)
+                # Amazon
+                if not lookup('RIGHT-TO-LEFT MARK') in entry['text'] and not lookup('RIGHT-TO-LEFT EMBEDDING') in entry['text']:
+                    entry['text'], n_changes = re.subn(r'^', lookup('RIGHT-TO-LEFT EMBEDDING'), entry['text'], flags=re.MULTILINE)
                     total_count += n_changes
                     total_count += entry['text'].count('?')
                     total_count += entry['text'].count(',')
@@ -758,7 +750,7 @@ class Ttml2Ssa(object):
     def _save_vtt_to_cache(self, url, vtt, offset):
         filename = self._cache_filename(url)
         self._printinfo('Saving {}'.format(filename))
-        
+
         data = {}
         data['data'] = vtt
         data['offset'] = offset
@@ -839,7 +831,7 @@ class Ttml2SsaAddon(Ttml2Ssa):
     def __init__(self, shift=0, source_fps=23.976, scale_factor=1, subtitle_language=None):
         super(Ttml2SsaAddon, self).__init__(shift, source_fps, scale_factor, subtitle_language)
         self.addon = Ttml2SsaAddon._addon()
-        
+
         try:  # Kodi >= 19
             from xbmcvfs import translatePath
         except ImportError:  # Kodi 18
