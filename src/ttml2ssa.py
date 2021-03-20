@@ -25,7 +25,7 @@ from timestampconverter import TimestampConverter
 
 class Ttml2Ssa(object):
 
-    VERSION = '0.3.3'
+    VERSION = '0.3.4'
 
     TIME_BASES = [
         'media',
@@ -363,11 +363,13 @@ class Ttml2Ssa(object):
             except ImportError:
                 # Python 3
                 from html.parser import HTMLParser
-            from unicodedata import lookup
             htmlparser = HTMLParser()
-            text = text.replace('&lrm;', lookup('LEFT-TO-RIGHT EMBEDDING'))
-            text = text.replace('&rlm;', lookup('RIGHT-TO-LEFT EMBEDDING'))
+            no_escape_list = [('&lrm;', '<lrm>'), ('&rlm;', '<rlm>')]
+            for c in no_escape_list:
+                text = text.replace(c[0], c[1])
             text = htmlparser.unescape(text)
+            for c in no_escape_list:
+                text = text.replace(c[1], c[0])
             return text
 
         del self.entries [:]
@@ -409,6 +411,9 @@ class Ttml2Ssa(object):
             if not self.allow_italics:
                 text = re.sub(r'<i>|</i>', '', text)
 
+            # Remove <c> </c> tags
+            text = re.sub('</??c.*?>', '', text)
+
             if self.allow_top_pos and entry['position'] == 'top':
                 text = Ttml2Ssa.TOP_MARKER + text
 
@@ -430,6 +435,9 @@ class Ttml2Ssa(object):
 
             if not self.allow_italics:
                 text = re.sub(r'<i>|</i>', '', text)
+
+            # Remove <c> </c> tags
+            text = re.sub('</??c.*?>', '', text)
 
             pos_str = 'line:90%,end'
             if self.allow_top_pos and entry['position'] == 'top':
@@ -547,13 +555,21 @@ class Ttml2Ssa(object):
                     entry['text'] = entry['text'].replace(rep[0], rep[1])
             if lang == 'ar':
                 from unicodedata import lookup
-                # Amazon
-                if not lookup('RIGHT-TO-LEFT MARK') in entry['text'] and not lookup('RIGHT-TO-LEFT EMBEDDING') in entry['text']:
-                    entry['text'], n_changes = re.subn(r'^', lookup('RIGHT-TO-LEFT EMBEDDING'), entry['text'], flags=re.MULTILINE)
+                # Netflix (vtt)
+                if not '&lrm;' in entry['text'] and not '&rlm;' in entry['text']:
+                    # Amazon
+                    entry['text'], n_changes = re.subn(r'^(?!{}|{})'.format(lookup('RIGHT-TO-LEFT MARK'), lookup('RIGHT-TO-LEFT EMBEDDING')), lookup('RIGHT-TO-LEFT EMBEDDING'), entry['text'], flags=re.MULTILINE)
                     total_count += n_changes
                     total_count += entry['text'].count('?')
                     total_count += entry['text'].count(',')
                     entry['text'] = entry['text'].replace('?', '؟').replace(',', '،')
+
+            # Netflix (vtt)
+            if '&lrm;' in entry['text'] or '&rlm;' in entry['text']:
+                from unicodedata import lookup
+                entry['text'] = entry['text'].replace('&lrm;', lookup('LEFT-TO-RIGHT EMBEDDING'))
+                entry['text'] = entry['text'].replace('&rlm;', lookup('RIGHT-TO-LEFT EMBEDDING'))
+
         self._printinfo("Replacements for language '{}': {}".format(lang, total_count))
 
     def _sequalize(self, entries):
