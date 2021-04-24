@@ -33,3 +33,8 @@ jobs:
           name: ${{ env.PACKAGELINUX }}
           path: ${{ env.PACKAGELINUX }}
        
+      - name: Upload kodi package
+        uses: actions/upload-artifact@v2
+        with:
+          name: ${{ env.PACKAGEKODI }}
+          path: kodi/${{ env.PACKAGEKODI }}
