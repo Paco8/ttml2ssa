@@ -13,5 +13,8 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
 
+      - name: Install build dependencies
+        run: sudo apt-get install gettext
+
       - name: Build packages
         run:  make && cd kodi && make
