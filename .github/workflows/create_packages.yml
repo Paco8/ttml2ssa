@@ -21,7 +21,7 @@ jobs:
             make && cd kodi && make && cd ..
             mkdir dist
             mv ttml2ssa-*.zip dist
-            mv kodi/cript.module.ttml2ssa-*.zip dist
+            mv kodi/script.module.ttml2ssa-*.zip dist
 
       - name: Get packages names
         run: |
