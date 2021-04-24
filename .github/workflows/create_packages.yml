@@ -18,3 +18,18 @@ jobs:
 
       - name: Build packages
         run:  make && cd kodi && make
+
+      - name: Get packages names
+        run: |
+            PACKAGELINUX=`ls ttml2ssa-*.zip`
+            cd kodi
+            PACKAGEKODI=`ls script.module.ttml2ssa-*.zip`
+            echo "PACKAGELINUX=$PACKAGELINUX" >> $GITHUB_ENV
+            echo "PACKAGEKODI=$PACKAGEKODI" >> $GITHUB_ENV
+            
+      - name: Upload linux package
+        uses: actions/upload-artifact@v2
+        with:
+          name: ${{ env.PACKAGELINUX }}
+          path: ${{ env.PACKAGELINUX }}
+       
