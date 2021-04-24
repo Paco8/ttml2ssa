@@ -17,12 +17,16 @@ jobs:
         run: sudo apt-get install gettext
 
       - name: Build packages
-        run:  make && cd kodi && make
+        run:  |
+            make && cd kodi && make
+            mkdir dist
+            mv ttml2ssa-*.zip dist
+            mv kodi/cript.module.ttml2ssa-*.zip dist
 
       - name: Get packages names
         run: |
+            cd dist
             PACKAGELINUX=`ls ttml2ssa-*.zip`
-            cd kodi
             PACKAGEKODI=`ls script.module.ttml2ssa-*.zip`
             echo "PACKAGELINUX=$PACKAGELINUX" >> $GITHUB_ENV
             echo "PACKAGEKODI=$PACKAGEKODI" >> $GITHUB_ENV
@@ -31,10 +35,20 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: ${{ env.PACKAGELINUX }}
-          path: ${{ env.PACKAGELINUX }}
+          path: dist/${{ env.PACKAGELINUX }}
        
       - name: Upload kodi package
         uses: actions/upload-artifact@v2
         with:
           name: ${{ env.PACKAGEKODI }}
-          path: kodi/${{ env.PACKAGEKODI }}
+          path: dist/${{ env.PACKAGEKODI }}
+
+      - name: Upload packages to release
+        if: github.event_name == 'release'
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: dist/*
+          tag: ${{ github.ref }}
+          overwrite: true
+          file_glob: true
