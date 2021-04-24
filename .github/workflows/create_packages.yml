@@ -18,7 +18,7 @@ jobs:
 
       - name: Build packages
         run:  |
-            make && cd kodi && make
+            make && cd kodi && make && cd ..
             mkdir dist
             mv ttml2ssa-*.zip dist
             mv kodi/cript.module.ttml2ssa-*.zip dist
