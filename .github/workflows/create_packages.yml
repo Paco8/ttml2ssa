@@ -27,9 +27,11 @@ jobs:
         run: |
             cd dist
             PACKAGELINUX=`ls ttml2ssa-*.zip`
-            PACKAGEKODI=`ls script.module.ttml2ssa-*.zip`
+            PACKAGEKODILEIA=`ls script.module.ttml2ssa-*-leia.zip`
+            PACKAGEKODIMATRIX=`ls script.module.ttml2ssa-*-matrix.zip`
             echo "PACKAGELINUX=$PACKAGELINUX" >> $GITHUB_ENV
-            echo "PACKAGEKODI=$PACKAGEKODI" >> $GITHUB_ENV
+            echo "PACKAGEKODILEIA=$PACKAGEKODILEIA" >> $GITHUB_ENV
+            echo "PACKAGEKODIMATRIX=$PACKAGEKODIMATRIX" >> $GITHUB_ENV
             
       - name: Upload linux package
         uses: actions/upload-artifact@v2
@@ -37,11 +39,17 @@ jobs:
           name: ${{ env.PACKAGELINUX }}
           path: dist/${{ env.PACKAGELINUX }}
        
-      - name: Upload kodi package
+      - name: Upload package kodi leia
         uses: actions/upload-artifact@v2
         with:
-          name: ${{ env.PACKAGEKODI }}
-          path: dist/${{ env.PACKAGEKODI }}
+          name: ${{ env.PACKAGEKODILEIA }}
+          path: dist/${{ env.PACKAGEKODILEIA }}
+       
+      - name: Upload package kodi matrix
+        uses: actions/upload-artifact@v2
+        with:
+          name: ${{ env.PACKAGEKODIMATRIX }}
+          path: dist/${{ env.PACKAGEKODIMATRIX }}
 
       - name: Upload packages to release
         if: github.event_name == 'release'
