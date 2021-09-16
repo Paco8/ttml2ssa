@@ -10,9 +10,9 @@ by Netflix, HBO, Disney+, Prime Video and other stream services to SRT,
 SSA/ASS and VTT format. It also provides a configuration dialog where the user
 can select the font size, colors, shadow and many other things.
 
-This is the idea: you create an addon to provide support for a streaming
-service in Kodi. Your addon downloads the subtitles (TTML, VTT, any supported
-format) and calls the ttml2ssa library to convert the subtitles to SSA/ASS.
+This is the idea: you created an addon to provide support for a streaming
+service in Kodi. Your addon downloads the subtitles (TTML, VTT...) and calls
+the ttml2ssa library to convert the subtitles to SSA/ASS.
 Subtitles will look nicer than the regular SRT format. Moreover the subtitles
 will be displayed on top of the screen when necessary (just like the official
 apps of Netflix, Disney+ and others do). The user will use the configuration
