@@ -3,7 +3,7 @@ subtitles for your addons.
 
 Even though Kodi is a great software it allows very little customization
 of subtitles (SRT format), you can mainly only change the color, that's all.
-Subtitles usually looks better on other media players.
+Subtitles usually look better on other media players.
 
 However Kodi also supports subtitles in SSA/ASS format, which are more
 customizable, for example you can add a shadow, set an outline color...
