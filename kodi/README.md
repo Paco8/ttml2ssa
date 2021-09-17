@@ -1,14 +1,18 @@
-Usually Kodi allow very little customization of subtitles (SRT format),
-you can mainly only change the color, that's all.
+Ttml2ssa is a library for Kodi which can help you provide better looking
+subtitles for your addons.
+
+Even though Kodi is a great software it allows very little customization
+of subtitles (SRT format), you can mainly only change the color, that's all.
+Subtitles usually looks better on other media players.
 
 However Kodi also supports subtitles in SSA/ASS format, which are more
 customizable, for example you can add a shadow, set an outline color...
 It's also possible to place the subtitles on the top of the screen.
 
 Ttml2ssa is a library that can convert TTML/XML/DFXP/VTT/SRT subtitles used
-by Netflix, HBO, Disney+, Prime Video and other stream services to SRT,
-SSA/ASS and VTT format. It also provides a configuration dialog where the user
-can select the font size, colors, shadow and many other things.
+by Netflix, HBO, Disney+, Prime Video and other stream services to the SSA/ASS
+format (it can also convert to SRT and VTT). It provides a configuration dialog
+where the user can select the font size, colors, shadow and many other things.
 
 This is the idea: you created an addon to provide support for a streaming
 service in Kodi. Your addon downloads the subtitles (TTML, VTT...) and calls
