@@ -23,13 +23,13 @@ necessary (just like the official apps of Netflix, Disney+ and others
 do).
 
 Ttml2ssa can also perform some cosmetic changes so the subtitles style is
-the same style among different services.
+the same among different services.
 
 Using the library is quite easy, it only requires a few lines of code to
 convert and save a subtitle.
 
 As demonstration there's available a Kodi repository with modified versions of
-the Netflix, Amazon, Disney+ and hbogoeu [*] addons with support for ttml2ssa:
+the Netflix, Amazon VOD, Disney+ and hbogoeu [*] addons with support for ttml2ssa:
 https://github.com/Paco8/kodi-repo
 
 [*] The support for ttml2ssa in hbogoeu is only available for Nordic/Spain.
