@@ -16,7 +16,7 @@ by Netflix, HBO, Disney+, Prime Video and other stream services to the SSA/ASS
 format (it can also convert to SRT and VTT). It provides a configuration dialog
 where the user can select the font size, colors, shadow and many other things.
 This configuration is shared by all addons that use the ttml2ssa library, so
-the user only has set up his preferences in one place.
+the user only has to set up his preferences in one place.
 
 Another benefit: subtitles will be displayed on top of the screen when
 necessary (just like the official apps of Netflix, Disney+ and others
