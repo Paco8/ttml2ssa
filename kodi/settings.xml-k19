@@ -97,14 +97,14 @@
                 </setting>
                 <setting id="marginl" type="integer" label="32014" help="">
                     <level>2</level>
-                    <default>40</default>
+                    <default>0</default>
                     <control type="edit" format="integer">
                         <heading>32014</heading>
                     </control>
                 </setting>
                 <setting id="marginr" type="integer" label="32015" help="">
                     <level>2</level>
-                    <default>40</default>
+                    <default>0</default>
                     <control type="edit" format="integer">
                         <heading>32015</heading>
                     </control>

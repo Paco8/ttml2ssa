@@ -14,8 +14,8 @@
         <setting label="32011" type="bool" id="bold" default="true"/>
         <setting label="32012" type="bool" id="italic" default="false"/>
         <setting label="32013" type="number" id="marginv" default="40"/>
-        <setting label="32014" type="number" id="marginl" default="40"/>
-        <setting label="32015" type="number" id="marginr" default="40"/>
+        <setting label="32014" type="number" id="marginl" default="0"/>
+        <setting label="32015" type="number" id="marginr" default="0"/>
     </category>
     <category label="32100">
         <setting label="32101" type="bool" id="allow_italics" default="true"/>

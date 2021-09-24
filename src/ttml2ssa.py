@@ -25,7 +25,7 @@ from timestampconverter import TimestampConverter
 
 class Ttml2Ssa(object):
 
-    VERSION = '0.3.4'
+    VERSION = '0.3.5'
 
     TIME_BASES = [
         'media',
@@ -121,6 +121,13 @@ class Ttml2Ssa(object):
         The result is stored in the `entries` list, as begin (ms), end (ms), text, position.
         """
 
+        def extract_rate(s):
+            try:
+                m = s.split(' ')
+                return int(m[0]) / int(m[1])
+            except:
+                return 1
+
         del self.entries [:]
         self._tc = TimestampConverter()
 
@@ -149,7 +156,8 @@ class Ttml2Ssa(object):
                 ('tickRate', 0, lambda x: int(x)),
                 ('timeBase', 'media', lambda x: x),
                 ('clockMode', '', lambda x: x),
-                ('frameRateMultiplier', 1, lambda x: int(x)),
+                #('frameRateMultiplier', 1, lambda x: int(x)),
+                ('frameRateMultiplier', 1, lambda x: extract_rate(x)),
                 ('subFrameRate', 1, lambda x: int(x)),
                 ('markerMode', '', lambda x: x),
                 ('dropMode', '', lambda x: x),
@@ -360,10 +368,11 @@ class Ttml2Ssa(object):
             try:
                 # Python 2
                 from HTMLParser import HTMLParser
+                htmlparser = HTMLParser()
             except ImportError:
                 # Python 3
-                from html.parser import HTMLParser
-            htmlparser = HTMLParser()
+                import html
+                htmlparser = html
             no_escape_list = [('&lrm;', '<lrm>'), ('&rlm;', '<rlm>')]
             for c in no_escape_list:
                 text = text.replace(c[0], c[1])
