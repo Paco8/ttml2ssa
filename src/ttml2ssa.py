@@ -25,7 +25,7 @@ from timestampconverter import TimestampConverter
 
 class Ttml2Ssa(object):
 
-    VERSION = '0.3.5'
+    VERSION = '0.3.6'
 
     TIME_BASES = [
         'media',
@@ -389,11 +389,16 @@ class Ttml2Ssa(object):
         while i < len(lines):
             line = lines[i].strip()
             i += 1
-            m = re.match(r'(?P<t1>\d{2}:\d{2}:\d{2}[\.,]\d{3})\s-->\s(?P<t2>\d{2}:\d{2}:\d{2}[\.,]\d{3})(?:.*(line:(?P<pos>[0-9.]+?))%)?', line)
+            #m = re.match(r'(?P<t1>\d{2}:\d{2}:\d{2}[\.,]\d{3})\s-->\s(?P<t2>\d{2}:\d{2}:\d{2}[\.,]\d{3})(?:.*(line:(?P<pos>[0-9.]+?))%)?', line)
+            m = re.match(r'(?P<t1>(\d{2}:)?\d{2}:\d{2}[\.,]\d{3})\s-->\s(?P<t2>(\d{2}:)?\d{2}:\d{2}[\.,]\d{3})(?:.*(line:(?P<pos>[0-9.]+?))%)?', line)
             if m:
+                time1 = m.group('t1').replace(',', '.')
+                time2 = m.group('t2').replace(',', '.')
+                if len(time1) == 9: time1 = "00:" + time1
+                if len(time2) == 9: time2 = "00:" + time2
                 entry = {}
-                entry['ms_begin'] = self._tc.timeexpr_to_ms(m.group('t1').replace(',', '.'))
-                entry['ms_end'] = self._tc.timeexpr_to_ms(m.group('t2').replace(',', '.'))
+                entry['ms_begin'] = self._tc.timeexpr_to_ms(time1)
+                entry['ms_end'] = self._tc.timeexpr_to_ms(time2)
                 entry['position'] = 'top' if m.group('pos') and float(m.group('pos')) < 50 else 'bottom'
                 text = ""
                 while i < len(lines):
