@@ -25,7 +25,7 @@ from timestampconverter import TimestampConverter
 
 class Ttml2Ssa(object):
 
-    VERSION = '0.3.6'
+    VERSION = '0.3.7'
 
     TIME_BASES = [
         'media',
@@ -628,7 +628,7 @@ class Ttml2Ssa(object):
         else:
             res = self.generate_srt()
 
-        with io.open(output, 'w', encoding=output_encoding) as handle:
+        with io.open(output, 'w', encoding=output_encoding, newline='') as handle:
             handle.write(res)
 
     def _read_file(self, filename, encoding=None):
