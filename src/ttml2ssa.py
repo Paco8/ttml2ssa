@@ -25,7 +25,7 @@ from timestampconverter import TimestampConverter
 
 class Ttml2Ssa(object):
 
-    VERSION = '0.3.7'
+    VERSION = '0.3.8'
 
     TIME_BASES = [
         'media',
@@ -58,6 +58,7 @@ class Ttml2Ssa(object):
 
         self.allow_timestamp_manipulation = True
         self.fix_timestamp_collisions = True
+        self.fix_duplicated_entries = True
 
         try:
             self.cache_directory = tempfile.gettempdir() # Fails on Android
@@ -80,13 +81,30 @@ class Ttml2Ssa(object):
         #  But it may not exist or it may be wrong.
         self.lang = None
 
-        self.ssa_style = OrderedDict([('Fontname', 'Arial'), ('Fontsize', 50), \
-                          ('PrimaryColour', '&H00EEEEEE'), ('BackColour', '&H40000000'), ('OutlineColour', '&H00000000'), \
-                          ('Bold', 0), ('Italic', 0), \
-                          ('Alignment', 2), \
-                          ('BorderStyle', 1), \
-                          ('Outline', 2), ('Shadow', 3), \
-                          ('MarginL', 40), ('MarginR', 40), ('MarginV', 40)])
+        self.ssa_style = OrderedDict([
+            ('Fontname', 'Arial'),
+            ('Fontsize', 50),
+            ('PrimaryColour', '&H00EEEEEE'),
+            ('SecondaryColour', '&H000000FF'),
+            ('BackColour', '&H40000000'),
+            ('OutlineColour', '&H00000000'),
+            ('Bold', 0),
+            ('Italic', 0),
+            ('Underline', 0),
+            ('Alignment', 2),
+            ('BorderStyle', 1),
+            ('Outline', 2),
+            ('Shadow', 3),
+            ('MarginL', 0),
+            ('MarginR', 0),
+            ('MarginV', 40),
+            ('StrikeOut', 0),
+            ('ScaleX', 100),
+            ('ScaleY', 100),
+            ('Spacing', 0),
+            ('Angle', 0),
+            ('Encoding', 1)
+        ])
         self.ssa_playresx = 1280
         self.ssa_playresy = 720
 
@@ -235,6 +253,9 @@ class Ttml2Ssa(object):
 
         if self.shift:
             self._shift_timestamps(self.shift)
+
+        if self.fix_duplicated_entries:
+            self.entries = self._remove_duplicated(self.entries)
 
         # Sort and fix timestamps
         self.entries = sorted(self.entries, key=lambda x: x['ms_begin'])
@@ -403,6 +424,10 @@ class Ttml2Ssa(object):
                 text = ""
                 while i < len(lines):
                     line = lines[i].strip()
+
+                    # Remove <c> </c> tags
+                    line = re.sub('</??c.*?>', '', line)
+
                     i += 1
                     if line:
                         if text: text += "\n"
@@ -471,12 +496,13 @@ class Ttml2Ssa(object):
                     s = round((timestamp_min_sep - diff) / 2)
                     entries[i]['ms_begin'] += s
                     entries[i-1]['ms_end'] -= s
+                    if entries[i-1]['ms_end'] < 0: entries[i-1]['ms_end'] = 0
 
         entries = deepcopy(self.entries)
         if self.allow_timestamp_manipulation and timestamp_min_sep > 0:
             fix_timestamps_separation(entries, timestamp_min_sep)
 
-        ssa_format_str = 'Dialogue: 0,{},{},Default,{}\r\n'
+        ssa_format_str = 'Dialogue: 0,{},{},Default,,0,0,0,,{}\r\n'
         res = ""
         for entry in entries:
             text = entry['text']
@@ -504,12 +530,13 @@ class Ttml2Ssa(object):
             "Collisions: Normal\r\n" \
             "PlayDepth: 0\r\n" \
             "PlayResX: {}\r\n" \
-            "PlayResY: {}\r\n\r\n" \
+            "PlayResY: {}\r\n" \
+            "ScaledBorderAndShadow: yes\r\n\r\n" \
             "[V4+ Styles]\r\n" \
-            "Format: Name, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}\r\n" \
-            "Style: Default,{},{},{},{},{},{},{},{},{},{},{},{},{},{}\r\n\r\n" \
+            "Format: Name,{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{}\r\n" \
+            "Style: Default,{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{}\r\n\r\n" \
             "[Events]\r\n" \
-            "Format: Layer, Start, End, Style, Text\r\n" \
+            "Format: Layer,Start,End,Style,Name,MarginL,MarginR,MarginV,Effect,Text\r\n" \
             .format(self.ssa_playresx, self.ssa_playresy, \
                     *list(self.ssa_style.keys()) + list(self.ssa_style.values()))
 
@@ -534,6 +561,10 @@ class Ttml2Ssa(object):
             number_of_lines = len(entry['text'].splitlines())
 
             entry['text'], n_changes = re.subn('—', '-', entry['text'])
+            total_count += n_changes
+            entry['text'], n_changes = re.subn('―', '-', entry['text'])
+            total_count += n_changes
+            entry['text'], n_changes = re.subn('–', '-', entry['text'])
             total_count += n_changes
 
             # Sometimes, in amazon subtitles, the line break is missing when the 2nd line starts with '<i>-'
@@ -605,6 +636,26 @@ class Ttml2Ssa(object):
 
         if total_count:
             self._printinfo("Sequalized entries: {}".format(total_count))
+
+        return res
+
+    def _remove_duplicated(self, entries):
+        """ Remove duplicated lines """
+
+        total_count = 0
+        res = []
+
+        for i in range(len(entries)):
+            if i > 0 and (entries[i]['text'] == entries[i-1]['text']) and \
+                         ((entries[i]['ms_begin'] == entries[i-1]['ms_begin'] and entries[i]['ms_end'] == entries[i-1]['ms_end']) or \
+                          (entries[i]['ms_begin'] == entries[i-1]['ms_end'])):
+                res[-1]['ms_end'] = entries[i]['ms_end']
+                total_count += 1
+            else:
+                res.append(entries[i])
+
+        if total_count:
+            self._printinfo("Duplicated entries removed: {}".format(total_count))
 
         return res
 
@@ -898,6 +949,7 @@ class Ttml2SsaAddon(Ttml2Ssa):
         self.allow_top_pos = self.addon.getSettingBool('allow_top_pos')
         self.allow_timestamp_manipulation = self.addon.getSettingBool('timestamp manipulation')
         self.fix_timestamp_collisions = self.addon.getSettingBool('fix_collisions')
+        self.fix_duplicated_entries = False
         self._printinfo("Subtitle type: {}".format(self.subtitle_type()))
         self._printinfo("SSA style: {}".format(self.ssa_style))
         self._printinfo("Cosmetic filter: {}".format("yes" if self.use_cosmetic_filter else "no"))

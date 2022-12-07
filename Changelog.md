@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.3.8] - 2022-12-07
+ * Remove the `<c></c>` tags from vtt files.
+ * Duplicated entries are removed by default.
+   The option `--no-remove-duplicated` disables this.
+ * Add missing fields in ssa output. Fixes bug #6.
+
 ## [0.3.7] - 2021-12-04
  * Fix end of line when saving on Windows.
 

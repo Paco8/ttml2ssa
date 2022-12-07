@@ -63,6 +63,8 @@ optional arguments:
   --no-timestamp-manipulation
                         no changes will be made on timestamps
   --no-fix-collisions   collisions on timestamps won't be fixed
+  --no-remove-duplicated
+                        duplicated texts won't be removed
   --min-sep-ms [ms]     minimum separation (in ms) between framestamps
                         (SSA/ASS output only)
 ```

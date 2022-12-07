@@ -147,7 +147,11 @@ if __name__ == '__main__':
     argparser.add_argument('--no-fix-collisions',
         dest="fix_collisions",
         help="collisions on timestamps won't be fixed",
-        action='store_false')   
+        action='store_false')
+    argparser.add_argument('--no-remove-duplicated',
+        dest="fix_duplicated",
+        help="duplicated texts won't be removed",
+        action='store_false')
     argparser.add_argument('--min-sep-ms',
         dest="ssa_timestamp_min_sep", metavar="ms",
         help="minimum separation (in ms) between framestamps (SSA/ASS output only)",
@@ -169,6 +173,7 @@ if __name__ == '__main__':
     ttml.allow_top_pos = args.allow_top_pos
     ttml.allow_timestamp_manipulation = args.timestamp_manipulation
     ttml.fix_timestamp_collisions = args.fix_collisions
+    ttml.fix_duplicated_entries = args.fix_duplicated
     ttml.ssa_timestamp_min_sep = args.ssa_timestamp_min_sep
     ttml.set_video_aspect_ratio(eval(args.aspect))
 
