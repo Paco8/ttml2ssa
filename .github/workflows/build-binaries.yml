@@ -1,0 +1,79 @@
+name: Build binaries
+
+on:
+  workflow_dispatch:
+  release:
+    types: [published]
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        config:
+          - { name: 'xenial', tag: 'linux', os: 'ubuntu-latest', container: 'wachii/ubuntu-qt:16.04' }
+          #- { name: 'bionic', tag: 'linux', os: 'ubuntu-18.04', container: '' }
+          - { name: 'windows', tag: 'win', os: 'windows-latest', container: '' }
+          - { name: 'macos', tag: 'macos', os: 'macos-11', container: '' }
+
+    runs-on: ${{ matrix.config.os }}
+    container: ${{ matrix.config.container }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Get version
+        shell: bash
+        run: |
+          VERSION=$(grep -o "VERSION = '[0-9.]\{1,\}'" src/ttml2ssa.py | sed "s/VERSION = '//;s/'//")
+          echo "VERSION=$VERSION" >> $GITHUB_ENV
+
+      - name: Install windows dependencies
+        if: ${{ matrix.config.name == 'windows' }}
+        run: choco install zip --no-progress
+
+      - name: Install xenial dependencies
+        if: ${{ matrix.config.name == 'xenial' }}
+        run: |
+          sudo apt-get -y update
+          sudo apt-get install -y zip
+          sudo apt-get install -y python3-pip zip
+          pip3 install --upgrade pip==20.3
+
+      - name: Install bionic dependencies
+        if: ${{ matrix.config.name == 'bionic' }}
+        run: sudo apt-get install -y zip
+
+      - name: Install python
+        if: ${{ matrix.config.name != 'xenial' }}
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.5'
+
+      - name: Install python dependencies
+        shell: bash
+        run: pip install pyinstaller
+
+      - name: Build package
+        shell: bash
+        run: |
+          pyinstaller --name=ttml2ssa --onefile src/__main__.py
+          mv dist/ttml2ssa dist/ttml2ssa-${{ matrix.config.tag }}
+          ls -l dist
+
+      - name: Create artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: ttml2ssa-${{env.VERSION}}
+          path: dist/*
+
+      - name: Upload package to release
+        if: github.event_name == 'release'
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: ./dist/*
+          tag: ${{ github.ref }}
+          overwrite: true
+          file_glob: true
