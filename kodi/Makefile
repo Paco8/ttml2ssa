@@ -19,8 +19,10 @@ install: ../src/ttml2ssa.py ../src/timestampconverter.py addon.xml-k18 addon.xml
 	cd translations && make
 	-install -d $(OUTPUT_DIR)/resources/language/resource.language.en_gb/
 	-install -d $(OUTPUT_DIR)/resources/language/resource.language.es_es/
+	-install -d $(OUTPUT_DIR)/resources/language/resource.language.pl_pl/
 	install -m 644 translations/en.po $(OUTPUT_DIR)/resources/language/resource.language.en_gb/strings.po
 	install -m 644 translations/es.po $(OUTPUT_DIR)/resources/language/resource.language.es_es/strings.po
+	install -m 644 translations/pl.po $(OUTPUT_DIR)/resources/language/resource.language.pl_pl/strings.po
 
 	zip -9 -r script.module.ttml2ssa-$(VERSION)-leia.zip $(OUTPUT_DIR)/ -x \*k18 \*k19
 	cp $(OUTPUT_DIR)/addon.xml-k19 $(OUTPUT_DIR)/addon.xml
