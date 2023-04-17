@@ -1,0 +1,150 @@
+# XBMC Media Center language file
+# Addon Name: Ttml2Ssa
+# Addon id: script.module.ttml2ssa
+# Addon version: 0.1.1
+# Addon Provider: Paco8
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: XBMC-Addons\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2020-12-28 16:47+0100\n"
+"PO-Revision-Date: 2023-04-17 HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE\n"
+"Language: hu\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgctxt "#32000"
+msgid "SSA Style"
+msgstr "SSA Stílus"
+
+msgctxt "#32001"
+msgid "Font name"
+msgstr "Betűtípus név"
+
+msgctxt "#32002"
+msgid "Font size"
+msgstr "Betűtípus méret"
+
+msgctxt "#32003"
+msgid "Primary colour (AABBGGRR or colour name)"
+msgstr "Alapszín (AABBGGRR vagy a szín neve)"
+
+msgctxt "#32004"
+msgid "Back colour (AABBGGRR or colour name)"
+msgstr "Háttérszín (AABBGGRR vagy a szín neve)"
+
+msgctxt "#32005"
+msgid "Outline colour (AABBGGRR or colour name)"
+msgstr "Keretszín (AABBGGRR vagy a szín neve)"
+
+msgctxt "#32006"
+msgid "Border style"
+msgstr "Keret stílusa"
+
+msgctxt "#32007"
+msgid "Outline with shadow"
+msgstr "Külső árnyék"
+
+msgctxt "#32008"
+msgid "Opaque box"
+msgstr "Áttetsző háttér"
+
+msgctxt "#32009"
+msgid "Outline"
+msgstr "Körvonal"
+
+msgctxt "#32010"
+msgid "Shadow"
+msgstr "Árnyék"
+
+msgctxt "#32011"
+msgid "Bold"
+msgstr "Kövér"
+
+msgctxt "#32012"
+msgid "Italic"
+msgstr "Dőlt"
+
+msgctxt "#32013"
+msgid "Vertical margin"
+msgstr "Függőleges margó"
+
+msgctxt "#32014"
+msgid "Left margin"
+msgstr "Baloldali margó"
+
+msgctxt "#32015"
+msgid "Right margin"
+msgstr "Jobboldali margó"
+
+msgctxt "#32016"
+msgid "Main"
+msgstr "Alapbeállítás"
+
+msgctxt "#32100"
+msgid "Misc"
+msgstr "Egyéb"
+
+msgctxt "#32101"
+msgid "Allow italics"
+msgstr "Dőlt engedélyezése"
+
+msgctxt "#32102"
+msgid "Allow text on the top"
+msgstr "Szöveg engedélyezése fenntre"
+
+msgctxt "#32103"
+msgid "Allow cosmetic changes"
+msgstr "Engedélyezze a stílusbeli változtatásokat"
+
+msgctxt "#32104"
+msgid "Allow fixes for some languages"
+msgstr "Javítások engedélyezése egyes nyelveken"
+
+msgctxt "#32105"
+msgid "Timestamp minimum separation (SSA only) in ms"
+msgstr "Időbélyeg minimális elválasztás (csak SSA) ms-ban"
+
+msgctxt "#32106"
+msgid "Allow timestamp manipulation"
+msgstr "Az időbélyeg kezelésének engedélyezése"
+
+msgctxt "#32107"
+msgid "Fix collisions"
+msgstr "Ütközések javítása"
+
+msgctxt "#32108"
+msgid "Try to fix Amazon errors"
+msgstr "Próbálja meg kijavítani az Amazon hibákat"
+
+msgctxt "#32109"
+msgid "Cache downloaded subtitles"
+msgstr "A letöltött feliratok gyorsítótárazása"
+
+msgctxt "#32200"
+msgid "Subtitle type"
+msgstr "Felirat típusa"
+
+msgctxt "#32201"
+msgid "Improved Subtitles Settings"
+msgstr "Továbbfejlesztett feliratbeállítások"
+
+msgctxt "#32202"
+msgid "Improved subtitles"
+msgstr "Javított feliratok"
+
+msgctxt "#32203"
+msgid "Normal (SRT)"
+msgstr "Normál (SRT)"
+
+msgctxt "#32204"
+msgid "Improved (SSA)"
+msgstr "Javított (SSA)"
+
+msgctxt "#32205"
+msgid "Both"
+msgstr "Mindkettő"
