@@ -11,6 +11,9 @@ es.po: empty.pot
 
 pl.po: empty.pot
 	msgmerge --lang=pl -U -N --backup=numbered pl.po empty.pot
+	
+pl.po: empty.pot
+	msgmerge --lang=pl -U -N --backup=numbered hu.po empty.pot
 
 clean:
 	-rm empty.pot
