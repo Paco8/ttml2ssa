@@ -11,7 +11,7 @@ install: ../src/ttml2ssa.py ../src/timestampconverter.py addon.xml-k18 addon.xml
 	install -m 644 icon.png $(OUTPUT_DIR)/
 	install -m 644 settings.xml-k18 $(OUTPUT_DIR)/resources/
 	install -m 644 settings.xml-k19 $(OUTPUT_DIR)/resources/
-	install -m 644 *.jpg $(OUTPUT_DIR)/resources/
+	install -m 644 fanart.jpg screen1.jpg screen2.jpg $(OUTPUT_DIR)/resources/
 	sed -e 's/{version}/$(VERSION)/' -i $(OUTPUT_DIR)/addon.xml-k18
 	cp $(OUTPUT_DIR)/addon.xml-k18 $(OUTPUT_DIR)/addon.xml
 	cp $(OUTPUT_DIR)/resources/settings.xml-k18 $(OUTPUT_DIR)/resources/settings.xml

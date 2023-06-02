@@ -25,7 +25,7 @@ from timestampconverter import TimestampConverter
 
 class Ttml2Ssa(object):
 
-    VERSION = '0.3.8'
+    VERSION = '0.3.9'
 
     TIME_BASES = [
         'media',
@@ -780,11 +780,12 @@ class Ttml2Ssa(object):
         """
 
         import requests
+        session = requests.Session()
 
         baseurl = os.path.dirname(url)
         self._printinfo('Downloading {}'.format(url))
         #self._printinfo('baseurl: {}'.format(baseurl))
-        r = requests.get(url, allow_redirects=True)
+        r = session.get(url, allow_redirects=True)
         segments = Ttml2Ssa.parse_m3u8_from_string(r.content.decode('utf-8'))
         #self._printinfo('segments: {}'.format(json.dumps(segments, sort_keys=True, indent=4)))
         self._printinfo('segments: {}'.format(json.dumps(segments)))
@@ -793,7 +794,7 @@ class Ttml2Ssa(object):
         for segment in segments:
             url = baseurl +'/'+ segment['url']
             self._printinfo('Downloading segment: {}'.format(os.path.basename(url)))
-            r = requests.get(url, allow_redirects=True)
+            r = session.get(url, allow_redirects=True)
             res += r.content.decode('utf-8')
 
         return res, segments
@@ -983,4 +984,4 @@ class Ttml2SsaAddon(Ttml2Ssa):
         """ Print info in the kodi log """
 
         import xbmc
-        xbmc.log("Ttml2Ssa: {}".format(text), xbmc.LOGINFO)
+        xbmc.log("Ttml2Ssa: {}".format(text), xbmc.LOGDEBUG)
