@@ -1,1 +1,1 @@
-python src/__main__.py %*
+python "%~dp0src/__main__.py" %*
