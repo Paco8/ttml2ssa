@@ -112,7 +112,11 @@ class TimestampConverter(object):
         """Convert hh:mm:ss.fraction to milliseconds
         """
 
-        hh, mm, ss, fraction = re.split(r'[:.]', timestamp)
+        try:
+            hh, mm, ss, fraction = re.split(r'[:.]', timestamp)
+        except:
+            hh, mm, ss = re.split(r'[:.]', timestamp)
+            fraction = "0"
         hh, mm, ss = [int(i) for i in (hh, mm, ss)]
         # Resolution beyond ms is useless for our purposes
         ms = int(fraction[:3])
@@ -124,8 +128,11 @@ class TimestampConverter(object):
 
         Will handle hh:mm:ss:frames.sub-frames by discarding the sub-frame part
         """
-
-        hh, mm, ss, frames = [int(i) for i in timestamp.split('.')[0].split(':')]
+        try:
+            hh, mm, ss, frames = [int(i) for i in timestamp.split('.')[0].split(':')]
+        except:
+            hh, mm, ss = [int(i) for i in timestamp.split('.')[0].split(':')]
+            frames = 0
         hhmmss_ms = self._hhmmss_to_ms(hh, mm, ss)
         ms = self.frames_to_ms(frames)
         return hhmmss_ms + ms
